@@ -1,0 +1,121 @@
+CREATE TABLE IF NOT EXISTS users (
+    email VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    vs_column_fields VARCHAR(50)[],
+    vs_visible_fields VARCHAR(50)[],
+
+    PRIMARY KEY (email)
+);
+
+CREATE TABLE IF NOT EXISTS categories (
+    category VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (category)
+);
+
+CREATE TABLE IF NOT EXISTS warehouse_locations (
+    warehouse_location_id VARCHAR(20) NOT NULL,
+
+    PRIMARY KEY (warehouse_location_id)
+);
+
+CREATE TABLE IF NOT EXISTS containers (
+    container_id VARCHAR(20) NOT NULL,
+    status VARCHAR(20),
+
+    PRIMARY KEY (container_id)
+);
+
+CREATE TABLE IF NOT EXISTS items (
+    item_id VARCHAR(10) NOT NULL,
+    status VARCHAR(20),
+
+    PRIMARY KEY (item_id)
+);
+
+CREATE TABLE IF NOT EXISTS fields (
+    field VARCHAR(50) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    datatype VARCHAR(20) NOT NULL,
+    in_sku BOOLEAN NOT NULL,
+    is_background BOOLEAN NOT NULL,
+    is_lockable BOOLEAN NOT NULL,
+    name_case VARCHAR(10) NOT NULL,
+    value_case VARCHAR(10) NOT NULL,
+    display_order SMALLINT NOT NULL,
+
+    PRIMARY KEY (field, category),
+    FOREIGN KEY (category) REFERENCES categories(category)
+);
+
+CREATE TABLE IF NOT EXISTS skus (
+    sku VARCHAR(20) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    specifications JSONB NOT NULL,
+
+    PRIMARY KEY (sku),
+    FOREIGN KEY (category) REFERENCES categories(category)
+);
+
+CREATE TABLE IF NOT EXISTS stocks (
+    date TIMESTAMPTZ NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    sku VARCHAR(20),
+    item_id VARCHAR(10) NOT NULL,
+    container_id VARCHAR(20),
+    warehouse_location_id VARCHAR(20),
+    specifications JSONB NOT NULL,
+    comments VARCHAR(255),
+    username VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (item_id, category),
+    FOREIGN KEY (category) REFERENCES categories(category),
+    FOREIGN KEY (sku) REFERENCES skus(sku),
+    FOREIGN KEY (item_id) REFERENCES items(item_id),
+    FOREIGN KEY (container_id) REFERENCES containers(container_id),
+    FOREIGN KEY (warehouse_location_id) REFERENCES warehouse_locations(warehouse_location_id)
+) PARTITION BY LIST (category);
+
+CREATE TABLE IF NOT EXISTS stock_update_history(
+    date TIMESTAMPTZ NOT NULL,
+    suh_uid UUID NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    sku VARCHAR(20),
+    item_id VARCHAR(10) NOT NULL,
+    specifications JSONB NOT NULL,
+    comments VARCHAR(255),
+    username VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (suh_uid, item_id, category),
+    FOREIGN KEY (category) REFERENCES categories(category),
+    FOREIGN KEY (sku) REFERENCES skus(sku),
+    FOREIGN KEY (item_id) REFERENCES items(item_id)
+) PARTITION BY LIST (category);
+
+CREATE TABLE IF NOT EXISTS stock_location_history(
+    date TIMESTAMPTZ NOT NULL,
+    slh_uid UUID NOT NULL,
+    group_id UUID NOT NULL,
+    items VARCHAR(10)[] NOT NULL,
+    container_id VARCHAR(20) NOT NULL,
+    warehouse_location_id VARCHAR(20) NOT NULL,
+    move_type VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    username VARCHAR(50) NOT NULL,
+
+    PRIMARY KEY (slh_uid),
+    FOREIGN KEY (container_id) REFERENCES containers(container_id),
+    FOREIGN KEY (warehouse_location_id) REFERENCES warehouse_locations(warehouse_location_id)
+);
+
+CREATE TABLE IF NOT EXISTS docking_station_stocks PARTITION OF stocks FOR VALUES IN ('Docking Station');
+
+CREATE TABLE IF NOT EXISTS laptop_stocks PARTITION OF stocks FOR VALUES IN ('Laptop');
+
+CREATE TABLE IF NOT EXISTS tft_stocks PARTITION OF stocks FOR VALUES IN ('TFT');
+
+CREATE TABLE IF NOT EXISTS docking_station_stock_update_history PARTITION OF stock_update_history FOR VALUES IN ('Docking Station');
+
+CREATE TABLE IF NOT EXISTS laptop_stock_update_history PARTITION OF stock_update_history FOR VALUES IN ('Laptop');
+
+CREATE TABLE IF NOT EXISTS tft_stock_update_history PARTITION OF stock_update_history FOR VALUES IN ('TFT');
