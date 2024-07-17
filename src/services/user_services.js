@@ -1,19 +1,19 @@
-export const getUserByEmail = async (executeQuery, email) => {
+export const getUserByEmail = (email) => {
   const query = "SELECT * FROM users WHERE email = $1;";
   const values = [email];
 
-  return await executeQuery(query, values);
+  return { query, values };
 };
 
-export const addNewUser = async (executeQuery, email, username) => {
+export const addNewUser = (email, username) => {
   const query =
     "INSERT INTO users (email, username) VALUES ($1, $2) RETURNING *;";
   const values = [email, username];
 
-  return await executeQuery(query, values);
+  return { query, values };
 };
 
-export const updateUser = async (executeQuery, email, body) => {
+export const updateUser = (email, body) => {
   const keys = Object.keys(body);
   const vals = Object.values(body);
 
@@ -34,12 +34,12 @@ export const updateUser = async (executeQuery, email, body) => {
   query += ` WHERE email = $${index++} RETURNING *;`;
   values.push(email);
 
-  return await executeQuery(query, values);
+  return { query, values };
 };
 
-export const deleteUser = async (executeQuery, email) => {
+export const deleteUser = (email) => {
   const query = "DELETE FROM users WHERE email = $1 RETURNING *;";
   const values = [email];
 
-  return await executeQuery(query, values);
+  return { query, values };
 };

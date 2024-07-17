@@ -3,7 +3,8 @@ import * as itemService from "../services/item_services.js";
 
 export const getAllItems = async (req, res) => {
   try {
-    const items = await itemService.getAllItems(executeQuery);
+    const { query, values } = itemService.getAllItems();
+    const items = await executeQuery(query, values);
 
     res.status(200).json(items);
   } catch (error) {
@@ -13,11 +14,13 @@ export const getAllItems = async (req, res) => {
 
 export const addNewItem = async (req, res) => {
   try {
-    const { item_id, status } = req.body;
+    const itemId = req.body.item_id;
+    const { status } = req.body;
 
-    const items = await itemService.addNewItem(executeQuery, item_id, status);
+    const { query, values } = itemService.addNewItem(itemId, status);
+    const item = await executeQuery(query, values);
 
-    res.status(201).json(items);
+    res.status(201).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -27,7 +30,8 @@ export const addNewItems = async (req, res) => {
   try {
     const body = req.body;
 
-    const items = await itemService.addNewItems(executeQuery, body);
+    const { query, values } = itemService.addNewItems(body);
+    const items = await executeQuery(query, values);
 
     res.status(200).json(items);
   } catch (error) {
@@ -37,12 +41,13 @@ export const addNewItems = async (req, res) => {
 
 export const updateItem = async (req, res) => {
   try {
-    const item_id = req.params.itemId;
+    const itemId = req.params["item-id"];
     const { status } = req.body;
 
-    const items = await itemService.updateItem(executeQuery, item_id, status);
+    const { query, values } = itemService.updateItem(itemId, status);
+    const item = await executeQuery(query, values);
 
-    res.status(200).json(items);
+    res.status(200).json(item);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
