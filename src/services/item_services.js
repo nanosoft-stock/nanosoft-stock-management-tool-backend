@@ -1,14 +1,14 @@
 export const getAllItems = () => {
-  const query = "SELECT * FROM items;";
+  const query = "SELECT * FROM items ORDER BY item_id;";
   const values = [];
 
   return { query, values };
 };
 
-export const addNewItem = (item_id, status) => {
+export const addNewItem = (itemId, status) => {
   const query =
     "INSERT INTO items (item_id, status) VALUES ($1, $2) RETURNING *;";
-  const values = [item_id, status];
+  const values = [itemId, status];
 
   return { query, values };
 };
@@ -30,9 +30,9 @@ export const addNewItems = (body) => {
   return { query, values };
 };
 
-export const updateItem = (item_id, status) => {
+export const updateItem = (itemId, status) => {
   const query = "UPDATE items SET status = $1 WHERE item_id = $2 RETURNING *;";
-  const values = [status, item_id];
+  const values = [status, itemId];
 
   return { query, values };
 };

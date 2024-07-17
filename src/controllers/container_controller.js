@@ -44,7 +44,7 @@ export const addNewContainers = async (req, res) => {
 
 export const updateContainer = async (req, res) => {
   try {
-    const containerId = req.params["container-id"];
+    const containerId = req.params.containerId;
     const { status } = req.body;
 
     const { query, values } = containerService.updateContainer(

@@ -41,7 +41,7 @@ export const addNewItems = async (req, res) => {
 
 export const updateItem = async (req, res) => {
   try {
-    const itemId = req.params["item-id"];
+    const itemId = req.params.itemId;
     const { status } = req.body;
 
     const { query, values } = itemService.updateItem(itemId, status);

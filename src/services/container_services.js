@@ -1,14 +1,14 @@
 export const getAllContainers = () => {
-  const query = "SELECT * FROM containers;";
+  const query = "SELECT * FROM containers ORDER BY container_id;";
   const values = [];
 
   return { query, values };
 };
 
-export const addNewContainer = (container_id, status) => {
+export const addNewContainer = (containerId, status) => {
   const query =
     "INSERT INTO containers (container_id, status) VALUES ($1, $2) RETURNING *;";
-  const values = [container_id, status];
+  const values = [containerId, status];
 
   return { query, values };
 };
@@ -30,10 +30,10 @@ export const addNewContainers = (body) => {
   return { query, values };
 };
 
-export const updateContainer = (container_id, status) => {
+export const updateContainer = (containerId, status) => {
   const query =
     "UPDATE containers SET status = $1 WHERE container_id = $2 RETURNING *;";
-  const values = [status, container_id];
+  const values = [status, containerId];
 
   return { query, values };
 };
