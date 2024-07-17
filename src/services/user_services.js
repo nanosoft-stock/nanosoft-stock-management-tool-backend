@@ -1,48 +1,45 @@
-import { query } from "../config/db.js";
+export const getUserByEmail = async (executeQuery, email) => {
+  const query = "SELECT * FROM users WHERE email = $1;";
+  const values = [email];
 
-export const createNewUser = async (email, username) => {
-  const result = await query(
-    "INSERT INTO users (email, username) VALUES ($1, $2) RETURNING *;",
-    [email, username]
-  );
-
-  return result.rows;
+  return await executeQuery(query, values);
 };
 
-export const getUserByEmail = async (email) => {
-  const result = await query("SELECT * FROM users WHERE email = $1 LIMIT 1;", [
-    email,
-  ]);
+export const addNewUser = async (executeQuery, email, username) => {
+  const query =
+    "INSERT INTO users (email, username) VALUES ($1, $2) RETURNING *;";
+  const values = [email, username];
 
-  return result.rows;
+  return await executeQuery(query, values);
 };
 
-export const updateUser = async (email, body) => {
+export const updateUser = async (executeQuery, email, body) => {
   const keys = Object.keys(body);
-  const values = Object.values(body);
+  const vals = Object.values(body);
 
+  // * Email field is not allowed to be updated
   const i = keys.indexOf("email");
   if (i != -1) {
     keys.splice(i, 1);
-    values.splice(i, 1);
+    vals.splice(i, 1);
   }
 
+  let query = "UPDATE users SET ";
+  const values = [];
+
   let index = 1;
-  const setClause = keys.map((key) => `${key} = $${index++}`).join(", ");
+  query += keys.map((key) => `${key} = $${index++}`).join(", ");
+  values.push(...vals);
 
-  const result = await query(
-    `UPDATE users SET ${setClause} WHERE email = $${index++} RETURNING *;`,
-    [...values, email]
-  );
+  query += ` WHERE email = $${index++} RETURNING *;`;
+  values.push(email);
 
-  return result.rows;
+  return await executeQuery(query, values);
 };
 
-export const deleteUser = async (email) => {
-  const result = await query(
-    `DELETE FROM users WHERE email = $1 RETURNING *;`,
-    [email]
-  );
+export const deleteUser = async (executeQuery, email) => {
+  const query = "DELETE FROM users WHERE email = $1 RETURNING *;";
+  const values = [email];
 
-  return result.rows;
+  return await executeQuery(query, values);
 };
