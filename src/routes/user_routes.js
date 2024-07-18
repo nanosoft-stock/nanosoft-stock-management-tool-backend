@@ -4,8 +4,8 @@ import * as userController from "../controllers/user_controller.js";
 const userRouter = Router();
 
 userRouter.route("/:email").get(userController.getUserByEmail);
-userRouter.route("/add").post(userController.addNewUser);
-userRouter.route("/:email").patch(userController.updateUser);
-userRouter.route("/:email").delete(userController.deleteUser);
+userRouter.route("/").post(userController.addNewUser);
+userRouter.route("/:userUUID").patch(userController.updateUser);
+userRouter.route("/:userUUID").delete(userController.deleteUser);
 
 export default userRouter;

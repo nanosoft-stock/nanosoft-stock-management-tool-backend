@@ -13,16 +13,9 @@ export const addNewUser = (email, username) => {
   return { query, values };
 };
 
-export const updateUser = (email, body) => {
+export const updateUser = (userUUID, body) => {
   const keys = Object.keys(body);
   const vals = Object.values(body);
-
-  // * Email field is not allowed to be updated
-  const i = keys.indexOf("email");
-  if (i != -1) {
-    keys.splice(i, 1);
-    vals.splice(i, 1);
-  }
 
   let query = "UPDATE users SET ";
   const values = [];
@@ -31,15 +24,15 @@ export const updateUser = (email, body) => {
   query += keys.map((key) => `${key} = $${index++}`).join(", ");
   values.push(...vals);
 
-  query += ` WHERE email = $${index++} RETURNING *;`;
-  values.push(email);
+  query += ` WHERE user_uuid = $${index++} RETURNING *;`;
+  values.push(userUUID);
 
   return { query, values };
 };
 
-export const deleteUser = (email) => {
-  const query = "DELETE FROM users WHERE email = $1 RETURNING *;";
-  const values = [email];
+export const deleteUser = (userUUID) => {
+  const query = "DELETE FROM users WHERE user_uuid = $1 RETURNING *;";
+  const values = [userUUID];
 
   return { query, values };
 };

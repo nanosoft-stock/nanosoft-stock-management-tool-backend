@@ -4,7 +4,7 @@ import * as containerService from "../controllers/container_controller.js";
 const containerRouter = Router();
 
 containerRouter.route("/").get(containerService.getAllContainers);
-containerRouter.route("/add").post(containerService.addNewContainer);
+containerRouter.route("/").post(containerService.addNewContainer);
 containerRouter.route("/batch").post(containerService.addNewContainers);
 containerRouter.route("/:containerId").patch(containerService.updateContainer);
 

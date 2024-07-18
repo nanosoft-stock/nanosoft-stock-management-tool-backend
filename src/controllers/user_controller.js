@@ -29,10 +29,10 @@ export const addNewUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const email = req.params.email;
+    const userUUID = req.params.userUUID;
     const body = req.body;
 
-    const { query, values } = userService.updateUser(email, body);
+    const { query, values } = userService.updateUser(userUUID, body);
     const user = await executeQuery(query, values);
 
     res.status(200).json(user);
@@ -43,9 +43,9 @@ export const updateUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const email = req.params.email;
+    const userUUID = req.params.userUUID;
 
-    const { query, values } = userService.deleteUser(email);
+    const { query, values } = userService.deleteUser(userUUID);
     const user = await executeQuery(query, values);
 
     res.status(200).json(user);

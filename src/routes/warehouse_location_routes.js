@@ -7,7 +7,7 @@ warehouseLocationRouter
   .route("/")
   .get(warehouseLocationController.getAllWarehouseLocations);
 warehouseLocationRouter
-  .route("/add")
+  .route("/")
   .post(warehouseLocationController.addNewWarehouseLocation);
 warehouseLocationRouter
   .route("/batch")
