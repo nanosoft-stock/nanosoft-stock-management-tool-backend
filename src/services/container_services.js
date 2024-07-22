@@ -1,3 +1,10 @@
+export const getContainer = (containerId) => {
+  const query = "SELECT * FROM containers WHERE container_id = $1;";
+  const values = [containerId];
+
+  return { query, values };
+};
+
 export const getAllContainers = () => {
   const query = "SELECT * FROM containers ORDER BY container_id;";
   const values = [];
@@ -5,35 +12,84 @@ export const getAllContainers = () => {
   return { query, values };
 };
 
-export const addNewContainer = (containerId, status) => {
-  const query =
-    "INSERT INTO containers (container_id, status) VALUES ($1, $2) RETURNING *;";
-  const values = [containerId, status];
+export const addContainer = (container) => {
+  const keys = Object.keys(container);
 
-  return { query, values };
-};
-
-export const addNewContainers = (body) => {
-  let query = "INSERT INTO containers (container_id, status) VALUES ";
+  let query = "INSERT INTO containers (";
   const values = [];
 
+  query += keys.join(", ");
+  query += ") VALUES ";
+
   let index = 1;
-  query += body
-    .map((entry) => {
-      values.push(entry.container_id, entry.status);
-      return `($${index++}, $${index++})`;
-    })
-    .join(", ");
+  query += "(" + keys.map((_) => `$${index++}`).join(", ") + ")";
+  values.push(...Object.values(container));
 
   query += " RETURNING *;";
 
   return { query, values };
 };
 
-export const updateContainer = (containerId, status) => {
-  const query =
-    "UPDATE containers SET status = $1 WHERE container_id = $2 RETURNING *;";
-  const values = [status, containerId];
+export const addContainers = (containers) => {
+  const keys = Object.keys(containers[0]);
+
+  let query = "INSERT INTO containers (";
+  const values = [];
+
+  query += keys.join(", ");
+  query += ") VALUES ";
+
+  let index = 1;
+  const insertStatements = [];
+
+  for (let container of containers) {
+    insertStatements.push(
+      "(" + keys.map((_) => `$${index++}`).join(", ") + ")"
+    );
+    for (let key of keys) {
+      values.push(container[key]);
+    }
+  }
+
+  query += insertStatements.join(", ");
+  query += " RETURNING *;";
+
+  return { query, values };
+};
+
+export const updateContainer = (container) => {
+  const { container_id: containerId, ...data } = container;
+  let keys = Object.keys(data);
+
+  let query = "UPDATE containers SET ";
+  const values = [];
+
+  let index = 1;
+  query += keys.map((key) => `${key} = $${index++}`).join(", ");
+  values.push(...Object.values(data));
+
+  query += ` WHERE container_id = $${index++} RETURNING *;`;
+  values.push(containerId);
+
+  return { query, values };
+};
+
+export const deleteContainer = (containerId) => {
+  const query = "DELETE FROM containers WHERE container_id = $1 RETURNING *;";
+  const values = [containerId];
+
+  return { query, values };
+};
+
+export const deleteContainers = (containers) => {
+  let index = 1;
+  let query = "DELETE FROM containers WHERE container_id IN (";
+  const values = [];
+
+  query += containers.map((_) => `$${index++}`).join(", ");
+  values.push(...containers);
+
+  query += ") RETURNING *;";
 
   return { query, values };
 };

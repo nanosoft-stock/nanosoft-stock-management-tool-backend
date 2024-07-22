@@ -1,42 +1,51 @@
 import { executeQuery } from "../config/db.js";
 import * as containerService from "../services/container_services.js";
 
+export const getContainer = async (req, res) => {
+  try {
+    const containerId = req.params.containerId;
+
+    const { query, values } = containerService.getContainer(containerId);
+    const result = await executeQuery(query, values);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getAllContainers = async (req, res) => {
   try {
     const { query, values } = containerService.getAllContainers();
-    const containers = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(containers);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const addNewContainer = async (req, res) => {
+export const addContainer = async (req, res) => {
   try {
-    const containerId = req.body.container_id;
-    const { status } = req.body;
+    const { data: container } = req.body;
 
-    const { query, values } = containerService.addNewContainer(
-      containerId,
-      status
-    );
-    const container = await executeQuery(query, values);
+    const { query, values } = containerService.addContainer(container);
+    const result = await executeQuery(query, values);
 
-    res.status(201).json(container);
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export const addNewContainers = async (req, res) => {
+export const addContainers = async (req, res) => {
   try {
-    const body = req.body;
+    const { data: containers } = req.body;
 
-    const { query, values } = containerService.addNewContainers(body);
-    const containers = await executeQuery(query, values);
+    const { query, values } = containerService.addContainers(containers);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(containers);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -44,16 +53,54 @@ export const addNewContainers = async (req, res) => {
 
 export const updateContainer = async (req, res) => {
   try {
-    const containerId = req.params.containerId;
-    const { status } = req.body;
+    const { data: container } = req.body;
 
-    const { query, values } = containerService.updateContainer(
-      containerId,
-      status
-    );
-    const container = await executeQuery(query, values);
+    const { query, values } = containerService.updateContainer(container);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(container);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateContainers = async (req, res) => {
+  try {
+    const { data: containers } = req.body;
+    const result = [];
+
+    for (let container of containers) {
+      const { query, values } = containerService.updateContainer(container);
+      result.push(...(await executeQuery(query, values)));
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteContainer = async (req, res) => {
+  try {
+    const { data: container } = req.body;
+
+    const { query, values } = containerService.deleteContainer(container);
+    const result = await executeQuery(query, values);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteContainers = async (req, res) => {
+  try {
+    const { data: containers } = req.body;
+
+    const { query, values } = containerService.deleteContainers(containers);
+    const result = await executeQuery(query, values);
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

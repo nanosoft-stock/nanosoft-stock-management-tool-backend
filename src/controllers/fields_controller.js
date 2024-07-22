@@ -46,7 +46,7 @@ export const updateFields = async (req, res) => {
     for (let field of fields) {
       const { field_uuid: fieldUUID, ...data } = field;
       const { query, values } = fieldsService.updateField(fieldUUID, data);
-      result.push(await executeQuery(query, values));
+      result.push(...(await executeQuery(query, values)));
     }
 
     res.status(200).json(result);

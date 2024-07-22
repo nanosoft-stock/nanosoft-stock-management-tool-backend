@@ -2,3 +2,4 @@
 /initial_db_data
 .env
 package-lock.json
+/.vscode
