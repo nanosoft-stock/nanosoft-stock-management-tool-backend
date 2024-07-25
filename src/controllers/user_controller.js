@@ -6,9 +6,9 @@ export const getUserByEmail = async (req, res) => {
     const email = req.params.email;
 
     const { query, values } = userService.getUserByEmail(email);
-    const user = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(user);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -16,12 +16,12 @@ export const getUserByEmail = async (req, res) => {
 
 export const addNewUser = async (req, res) => {
   try {
-    const { email, username } = req.body;
+    const { data: user } = req.body;
 
-    const { query, values } = userService.addNewUser(email, username);
-    const user = await executeQuery(query, values);
+    const { query, values } = userService.addNewUser(user);
+    const result = await executeQuery(query, values);
 
-    res.status(201).json(user);
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -30,12 +30,12 @@ export const addNewUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userUUID = req.params.userUUID;
-    const body = req.body;
+    const { data: user } = req.body;
 
-    const { query, values } = userService.updateUser(userUUID, body);
-    const user = await executeQuery(query, values);
+    const { query, values } = userService.updateUser(userUUID, user);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(user);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -46,9 +46,9 @@ export const deleteUser = async (req, res) => {
     const userUUID = req.params.userUUID;
 
     const { query, values } = userService.deleteUser(userUUID);
-    const user = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(user);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

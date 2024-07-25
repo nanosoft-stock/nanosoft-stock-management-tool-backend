@@ -1,0 +1,136 @@
+const commonColumns = [
+  "date",
+  "category",
+  "sku_uuid",
+  "serial_number",
+  "item_id",
+  "container_id",
+  "warehouse_location_id",
+  "supplier_info",
+  "comments",
+  "user_uuid",
+];
+
+export const getStock = async (itemId, executeQuery) => {
+  let query = "SELECT stocks.*, ";
+
+  const categories = (
+    await executeQuery("SELECT category FROM categories;")
+  ).map((category) => category["category"]);
+
+  const selectClauses = [];
+  const joinClauses = [];
+
+  for (let category of categories) {
+    const category_name = category;
+    category = category.replace(/ /g, "_").toLowerCase();
+
+    selectClauses.push(
+      `row_to_json(${category}_specifications.*) AS ${category}`
+    );
+    joinClauses.push(
+      `LEFT JOIN ${category}_specifications ON stocks.item_id = ${category}_specifications.item_id AND stocks.category = '${category_name}'`
+    );
+  }
+
+  query += selectClauses.join(", ");
+  query += ", users.username";
+  query += " FROM stocks ";
+  query += joinClauses.join(" ");
+  query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
+  query += " WHERE stocks.item_id = $1;";
+
+  const values = [itemId];
+
+  return { query, values };
+};
+
+export const getAllStocks = async (executeQuery) => {
+  let query = "SELECT stocks.*, ";
+
+  const categories = (
+    await executeQuery("SELECT category FROM categories;")
+  ).map((category) => category["category"]);
+
+  const selectClauses = [];
+  const joinClauses = [];
+
+  for (let category of categories) {
+    const category_name = category;
+    category = category.replace(/ /g, "_").toLowerCase();
+
+    selectClauses.push(
+      `row_to_json(${category}_specifications.*) AS ${category}`
+    );
+    joinClauses.push(
+      `LEFT OUTER JOIN ${category}_specifications ON stocks.item_id = ${category}_specifications.item_id AND stocks.category = '${category_name}'`
+    );
+  }
+
+  query += selectClauses.join(", ");
+  query += ", users.username";
+  query += " FROM stocks ";
+  query += joinClauses.join(" ");
+  query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
+  query += "ORDER BY date DESC LIMIT 100;";
+
+  const values = [];
+
+  return { query, values };
+};
+
+export const addStock = async (stock, executeQuery) => {
+  const keys = Object.keys(stock);
+
+  const stockColumns = {};
+  const categoryBasedColumns = {};
+
+  for (let key of keys) {
+    if (key == "item_id") {
+      categoryBasedColumns[key] = stock[key];
+    }
+
+    if (commonColumns.includes(key)) {
+      stockColumns[key] = stock[key];
+    } else {
+      categoryBasedColumns[key] = stock[key];
+    }
+  }
+
+  let stockQuery = "INSERT INTO stocks (";
+  const stockValues = [];
+  let index = 1;
+
+  stockQuery += Object.keys(stockColumns).join(", ");
+  stockQuery += ") VALUES ";
+
+  stockQuery += "(";
+  stockQuery += Object.keys(stockColumns)
+    .map((_) => `$${index++}`)
+    .join(", ");
+  stockQuery += ");";
+
+  stockValues.push(...Object.values(stockColumns));
+
+  await executeQuery(stockQuery, stockValues);
+
+  const categoryKey = stock.category.replace(" ", "_").toLowerCase();
+  let categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications (`;
+  const categoryBasedValues = [];
+  index = 1;
+
+  categoryBasedQuery += Object.keys(categoryBasedColumns).join(", ");
+  categoryBasedQuery += ") VALUES ";
+
+  categoryBasedQuery += "(";
+  categoryBasedQuery += Object.keys(categoryBasedColumns)
+    .map((_) => `$${index++}`)
+    .join(", ");
+  categoryBasedQuery += ");";
+
+  categoryBasedValues.push(...Object.values(categoryBasedColumns));
+
+  await executeQuery(categoryBasedQuery, categoryBasedValues);
+
+  return await getStock(stock.item_id, executeQuery);
+};

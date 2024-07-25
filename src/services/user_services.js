@@ -5,17 +5,28 @@ export const getUserByEmail = (email) => {
   return { query, values };
 };
 
-export const addNewUser = (email, username) => {
-  const query =
-    "INSERT INTO users (email, username) VALUES ($1, $2) RETURNING *;";
-  const values = [email, username];
+export const addNewUser = (user) => {
+  const keys = Object.keys(user);
+  const vals = Object.values(user);
+
+  let query = "INSERT INTO users (";
+  const values = [];
+  let index = 1;
+
+  query += keys.join(", ");
+  query += ") VALUES (";
+  query += keys.map((_) => `$${index++}`).join(", ");
+
+  values.push(...vals);
+
+  query += ") RETURNING *;";
 
   return { query, values };
 };
 
-export const updateUser = (userUUID, body) => {
-  const keys = Object.keys(body);
-  const vals = Object.values(body);
+export const updateUser = (userUUID, user) => {
+  const keys = Object.keys(user);
+  const vals = Object.values(user);
 
   let query = "UPDATE users SET ";
   const values = [];

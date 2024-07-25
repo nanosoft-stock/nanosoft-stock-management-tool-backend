@@ -19,17 +19,17 @@ export const addNewCategory = (category) => {
   return { query, values };
 };
 
-export const updateCategory = (categoryUUID, category) => {
+export const updateCategory = (oldCategory, newCategory) => {
   const query =
-    "UPDATE categories SET category = $1 WHERE category_uuid = $2 RETURNING *;";
-  const values = [category, categoryUUID];
+    "UPDATE categories SET category = $1 WHERE category = $2 RETURNING *;";
+  const values = [newCategory, oldCategory];
 
   return { query, values };
 };
 
-export const deleteCategory = (categoryUUID) => {
-  const query = "DELETE FROM categories WHERE category_uuid = $1 RETURNING *;";
-  const values = [categoryUUID];
+export const deleteCategory = (category) => {
+  const query = "DELETE FROM categories WHERE category = $1 RETURNING *;";
+  const values = [category];
 
   return { query, values };
 };

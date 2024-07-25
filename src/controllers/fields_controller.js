@@ -14,9 +14,9 @@ export const getAllFields = async (req, res) => {
 
 export const getCategoryFields = async (req, res) => {
   try {
-    const categoryUUID = req.params.categoryUUID;
+    const category = req.params.category;
 
-    const { query, values } = fieldsService.getCategoryFields(categoryUUID);
+    const { query, values } = fieldsService.getCategoryFields(category);
     const result = await executeQuery(query, values);
 
     res.status(200).json(result);
@@ -27,7 +27,7 @@ export const getCategoryFields = async (req, res) => {
 
 export const addFields = async (req, res) => {
   try {
-    const { fields } = req.body;
+    const { data: fields } = req.body;
 
     const { query, values } = fieldsService.addFields(fields);
     const result = await executeQuery(query, values);
@@ -40,7 +40,7 @@ export const addFields = async (req, res) => {
 
 export const updateFields = async (req, res) => {
   try {
-    const { fields } = req.body;
+    const { data: fields } = req.body;
     const result = [];
 
     for (let field of fields) {
@@ -57,7 +57,7 @@ export const updateFields = async (req, res) => {
 
 export const deleteFields = async (req, res) => {
   try {
-    const { fields } = req.body;
+    const { data: fields } = req.body;
 
     const { query, values } = fieldsService.deleteFields(fields);
     const result = await executeQuery(query, values);

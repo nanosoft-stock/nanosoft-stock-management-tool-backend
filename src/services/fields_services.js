@@ -5,10 +5,10 @@ export const getAllFields = () => {
   return { query, values };
 };
 
-export const getCategoryFields = (categoryUUID) => {
+export const getCategoryFields = (category) => {
   const query =
-    "SELECT * FROM fields WHERE category_uuid = $1 ORDER BY display_order;";
-  const values = [categoryUUID];
+    "SELECT * FROM fields WHERE category = $1 ORDER BY display_order;";
+  const values = [category];
 
   return { query, values };
 };
@@ -42,15 +42,15 @@ export const addFields = (fields) => {
   return { query, values };
 };
 
-export const updateField = (fieldUUID, data) => {
-  let keys = Object.keys(data);
+export const updateField = (fieldUUID, fields) => {
+  let keys = Object.keys(fields);
 
   let query = "UPDATE fields SET ";
   const values = [];
 
   let index = 1;
   query += keys.map((key) => `${key} = $${index++}`).join(", ");
-  values.push(...Object.values(data));
+  values.push(...Object.values(fields));
 
   query += ` WHERE field_uuid = $${index++} RETURNING *;`;
   values.push(fieldUUID);
@@ -58,9 +58,11 @@ export const updateField = (fieldUUID, data) => {
   return { query, values };
 };
 
-export const deleteFields = (ids) => {
-  let query = "DELETE FROM fields WHERE field_uuid IN $1 RETURNING *;";
-  const values = [ids];
+export const deleteFields = (fields) => {
+  let query = "DELETE FROM fields WHERE field_uuid = ANY($1) RETURNING *;";
+  const values = [fields];
+
+  console.log(query, values);
 
   return { query, values };
 };

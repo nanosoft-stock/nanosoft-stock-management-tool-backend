@@ -4,9 +4,9 @@ import * as categoryService from "../services/category_services.js";
 export const getAllCategories = async (req, res) => {
   try {
     const { query, values } = categoryService.getAllCategories();
-    const categories = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(categories);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -17,9 +17,9 @@ export const getCategory = async (req, res) => {
     const category = req.params.category;
 
     const { query, values } = categoryService.getCategory(category);
-    const categories = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(categories);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -27,12 +27,12 @@ export const getCategory = async (req, res) => {
 
 export const addNewCategory = async (req, res) => {
   try {
-    const { category } = req.body;
+    const { data: category } = req.body;
 
     const { query, values } = categoryService.addNewCategory(category);
-    const categories = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(201).json(categories);
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -40,16 +40,16 @@ export const addNewCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
-    const categoryUUID = req.params.categoryUUID;
-    const { category } = req.body;
+    const oldCategory = req.params.category;
+    const { data: newCategory } = req.body;
 
     const { query, values } = categoryService.updateCategory(
-      categoryUUID,
-      category
+      oldCategory,
+      newCategory
     );
-    const categories = await executeQuery(query, values);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(categories);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -57,12 +57,12 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
-    const categoryUUID = req.params.categoryUUID;
+    const category = req.params.category;
 
-    const { query, values } = categoryService.deleteCategory(categoryUUID);
-    const categories = await executeQuery(query, values);
+    const { query, values } = categoryService.deleteCategory(category);
+    const result = await executeQuery(query, values);
 
-    res.status(200).json(categories);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
