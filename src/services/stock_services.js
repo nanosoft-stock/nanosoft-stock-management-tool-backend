@@ -72,7 +72,7 @@ export const getAllStocks = async (executeQuery) => {
   query += " FROM stocks ";
   query += joinClauses.join(" ");
   query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
-  query += "ORDER BY date DESC LIMIT 100;";
+  query += "ORDER BY date DESC;";
 
   const values = [];
 
@@ -133,4 +133,71 @@ export const addStock = async (stock, executeQuery) => {
   await executeQuery(categoryBasedQuery, categoryBasedValues);
 
   return await getStock(stock.item_id, executeQuery);
+};
+
+export const queryStocks = async (q, executeQuery) => {
+  const {
+    distinct,
+    count,
+    columns,
+    join,
+    where,
+    order_by: orderBy,
+    limit,
+    offset,
+  } = q;
+
+  let query = "SELECT ";
+  const values = [];
+  let index = 1;
+
+  if (distinct) {
+    query += "DISTINCT ";
+  }
+
+  if (count) {
+    query += "COUNT(*) ";
+  } else {
+    query += columns.join(", ");
+  }
+
+  query += " FROM stocks ";
+
+  if (join) {
+    query += join
+      .map(
+        (j) =>
+          `${j.type.toUpperCase()} JOIN ${j.table} ON stocks.${j.field} = ${
+            j.table
+          }.${j.field}`
+      )
+      .join(" ");
+  }
+
+  if (where) {
+    query += " WHERE ";
+    query += where
+      .map(
+        (w) => `${w.field}${w.not === true ? " NOT " : " "}${w.op} $${index++}`
+      )
+      .join(" AND ");
+    values.push(...where.map((w) => w.value));
+  }
+
+  if (orderBy) {
+    query += " ORDER BY ";
+    query += orderBy.map((o) => `${o.field} ${o.direction}`).join(", ");
+  }
+
+  if (limit) {
+    query += ` LIMIT ${limit}`;
+  }
+
+  if (offset) {
+    query += ` OFFSET ${offset}`;
+  }
+
+  query += ";";
+
+  return { query, values };
 };

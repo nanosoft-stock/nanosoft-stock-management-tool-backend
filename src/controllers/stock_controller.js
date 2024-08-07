@@ -66,7 +66,10 @@ export const updateStock = async (req, res) => {
   try {
     const { data: stock } = req.body;
 
-    const { query, values } = stockService.updateStock(stock, executeQuery);
+    const { query, values } = await stockService.updateStock(
+      stock,
+      executeQuery
+    );
     const result = await executeQuery(query, values);
 
     res.status(200).json(result);
@@ -81,7 +84,10 @@ export const updateStocks = async (req, res) => {
     const result = [];
 
     for (let stock of stocks) {
-      const { query, values } = stockService.updateStock(stock, executeQuery);
+      const { query, values } = await stockService.updateStock(
+        stock,
+        executeQuery
+      );
       result.push(await executeQuery(query, values));
     }
 
@@ -95,7 +101,10 @@ export const deleteStock = async (req, res) => {
   try {
     const { data: stock } = req.body;
 
-    const { query, values } = stockService.deleteStock(stock, executeQuery);
+    const { query, values } = await stockService.deleteStock(
+      stock,
+      executeQuery
+    );
     const result = await executeQuery(query, values);
 
     res.status(200).json(result);
@@ -108,7 +117,23 @@ export const deleteStocks = async (req, res) => {
   try {
     const { data: stocks } = req.body;
 
-    const { query, values } = stockService.deleteStocks(stocks, executeQuery);
+    const { query, values } = await stockService.deleteStocks(
+      stocks,
+      executeQuery
+    );
+    const result = await executeQuery(query, values);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const queryStocks = async (req, res) => {
+  try {
+    const { data: q } = req.body;
+
+    const { query, values } = await stockService.queryStocks(q, executeQuery);
     const result = await executeQuery(query, values);
 
     res.status(200).json(result);

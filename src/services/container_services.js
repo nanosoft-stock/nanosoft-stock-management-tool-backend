@@ -74,9 +74,9 @@ export const updateContainer = (container) => {
   return { query, values };
 };
 
-export const deleteContainer = (containerId) => {
+export const deleteContainer = (container) => {
   const query = "DELETE FROM containers WHERE container_id = $1 RETURNING *;";
-  const values = [containerId];
+  const values = [container.container_id];
 
   return { query, values };
 };
@@ -87,7 +87,7 @@ export const deleteContainers = (containers) => {
   const values = [];
 
   query += containers.map((_) => `$${index++}`).join(", ");
-  values.push(...containers);
+  values.push(...containers.map((container) => container.container_id));
 
   query += ") RETURNING *;";
 

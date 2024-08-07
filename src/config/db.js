@@ -44,6 +44,7 @@ export const executeQuery = async (query, values) => {
     pool.query("COMMIT;");
     return result.rows;
   } catch (error) {
+    console.log(error);
     pool.query("ROLLBACK;");
     throw error;
   }

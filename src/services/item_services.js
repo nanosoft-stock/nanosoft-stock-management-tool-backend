@@ -75,7 +75,7 @@ export const updateItem = (item) => {
 };
 
 export const deleteItem = (item) => {
-  const query = "DelETE FROM items WHERE item_id = $1 RETURNING *;";
+  const query = "DELETE FROM items WHERE item_id = $1 RETURNING *;";
   const values = [item.item_id];
 
   return { query, values };
@@ -87,7 +87,7 @@ export const deleteItems = (items) => {
   const values = [];
 
   query += items.map((_) => `$${index++}`).join(", ");
-  values.push(...items);
+  values.push(...items.map((item) => item.item_id));
 
   query += ") RETURNING *;";
 

@@ -75,23 +75,27 @@ export const updateWarehouseLocation = (warehouseLocation) => {
   return { query, values };
 };
 
-export const deleteWarehouseLocation = (warehouseLocationId) => {
+export const deleteWarehouseLocation = (warehouseLocation) => {
   const query =
     "DELETE FROM warehouse_locations WHERE warehouse_location_id = $1 RETURNING *;";
-  const values = [warehouseLocationId];
+  const values = [warehouseLocation.warehouse_location_id];
 
   return { query, values };
 };
 
-export const deleteWarehouseLocations = (warehouseLocationIds) => {
+export const deleteWarehouseLocations = (warehouseLocations) => {
   let index = 1;
 
   let query =
     "DELETE FROM warehouse_locations WHERE warehouse_location_id IN (";
   const values = [];
 
-  query += warehouseLocationIds.map((_) => `$${index++}`).join(", ");
-  values.push(...warehouseLocationIds);
+  query += warehouseLocations.map((_) => `$${index++}`).join(", ");
+  values.push(
+    ...warehouseLocations.map(
+      (warehouseLocation) => warehouseLocation.warehouse_location_id
+    )
+  );
 
   query += ") RETURNING *;";
 

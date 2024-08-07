@@ -16,4 +16,6 @@ stockRouter.route("/batch").patch(stockController.updateStocks);
 stockRouter.route("/").delete(stockController.deleteStock);
 stockRouter.route("/batch").delete(stockController.deleteStocks);
 
+stockRouter.route("/query").post(stockController.queryStocks);
+
 export default stockRouter;
