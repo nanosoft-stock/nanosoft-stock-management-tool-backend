@@ -151,11 +151,11 @@ export const queryStocks = async (q, executeQuery) => {
   const values = [];
   let index = 1;
 
-  if (distinct) {
+  if (distinct !== undefined && distinct !== false) {
     query += "DISTINCT ";
   }
 
-  if (count) {
+  if (count !== undefined && count !== false) {
     query += "COUNT(*) ";
   } else {
     query += columns.join(", ");
@@ -163,7 +163,7 @@ export const queryStocks = async (q, executeQuery) => {
 
   query += " FROM stocks ";
 
-  if (join) {
+  if (join !== undefined && join.length > 0) {
     query += join
       .map(
         (j) =>
@@ -174,30 +174,48 @@ export const queryStocks = async (q, executeQuery) => {
       .join(" ");
   }
 
-  if (where) {
+  if (where !== undefined && where.length > 0) {
     query += " WHERE ";
     query += where
       .map(
-        (w) => `${w.field}${w.not === true ? " NOT " : " "}${w.op} $${index++}`
+        (whe) =>
+          `${whe
+            .map((w) => {
+              if (w.op === "IN") {
+                values.push(...w.value);
+
+                return `${w.field}${w.not === true ? " NOT " : " "}${
+                  w.op
+                } (${w.value.map((_) => `$${index++}`).join(", ")})`;
+              } else {
+                values.push(w.value);
+
+                return `${w.field}${w.not === true ? " NOT " : " "}${
+                  w.op
+                } $${index++}`;
+              }
+            })
+            .join(" OR ")}`
       )
       .join(" AND ");
-    values.push(...where.map((w) => w.value));
   }
 
-  if (orderBy) {
+  if (orderBy !== undefined && orderBy.length > 0) {
     query += " ORDER BY ";
     query += orderBy.map((o) => `${o.field} ${o.direction}`).join(", ");
   }
 
-  if (limit) {
+  if (limit !== undefined) {
     query += ` LIMIT ${limit}`;
   }
 
-  if (offset) {
+  if (offset !== undefined) {
     query += ` OFFSET ${offset}`;
   }
 
   query += ";";
+
+  console.log(query, values);
 
   return { query, values };
 };
