@@ -135,8 +135,9 @@ export const queryStocks = async (req, res) => {
 
     const { query, values } = await stockService.queryStocks(q, executeQuery);
     const result = await executeQuery(query, values);
+    const processedResult = postProcessStocks(result);
 
-    res.status(200).json(result);
+    res.status(200).json(processedResult);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

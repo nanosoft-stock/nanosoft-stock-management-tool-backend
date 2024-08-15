@@ -72,7 +72,7 @@ export const getAllStocks = async (executeQuery) => {
   query += " FROM stocks ";
   query += joinClauses.join(" ");
   query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
-  query += "ORDER BY date DESC;";
+  query += "ORDER BY stocks.date DESC, stocks.item_id DESC LIMIT 100;";
 
   const values = [];
 
@@ -148,7 +148,7 @@ export const queryStocks = async (q, executeQuery) => {
   } = q;
 
   let query = "SELECT ";
-  const values = [];
+  let values = [];
   let index = 1;
 
   if (distinct !== undefined && distinct !== false) {
@@ -156,7 +156,7 @@ export const queryStocks = async (q, executeQuery) => {
   }
 
   if (count !== undefined && count !== false) {
-    query += "COUNT(*) ";
+    query += "COUNT(*)";
   } else {
     query += columns.join(", ");
   }
@@ -174,30 +174,13 @@ export const queryStocks = async (q, executeQuery) => {
       .join(" ");
   }
 
-  if (where !== undefined && where.length > 0) {
+  if (where !== undefined && Object.keys(where).length > 0) {
     query += " WHERE ";
-    query += where
-      .map(
-        (whe) =>
-          `${whe
-            .map((w) => {
-              if (w.op === "IN") {
-                values.push(...w.value);
-
-                return `${w.field}${w.not === true ? " NOT " : " "}${
-                  w.op
-                } (${w.value.map((_) => `$${index++}`).join(", ")})`;
-              } else {
-                values.push(w.value);
-
-                return `${w.field}${w.not === true ? " NOT " : " "}${
-                  w.op
-                } $${index++}`;
-              }
-            })
-            .join(" OR ")}`
-      )
-      .join(" AND ");
+    let w = buildWhereClause(where, values, index);
+    console.log(w);
+    query += w.query;
+    values = w.values;
+    index = w.index;
   }
 
   if (orderBy !== undefined && orderBy.length > 0) {
@@ -218,4 +201,47 @@ export const queryStocks = async (q, executeQuery) => {
   console.log(query, values);
 
   return { query, values };
+};
+
+const buildWhereClause = (where, values, index) => {
+  let query = "";
+  if (where.type === "AND") {
+    let ands = [];
+    for (let i = 0; i < where.nodes.length; i++) {
+      let w = buildWhereClause(where.nodes[i], values, index);
+      ands.push(w.query);
+      values = w.values;
+      index = w.index;
+    }
+    query = "(" + ands.join(" AND ") + ")";
+  } else if (where.type === "OR") {
+    let ors = [];
+    for (let i = 0; i < where.nodes.length; i++) {
+      let w = buildWhereClause(where.nodes[i], values, index);
+      ors.push(w.query);
+      values = w.values;
+      index = w.index;
+    }
+    query = "(" + ors.join(" OR ") + ")";
+  } else {
+    let data = where.data;
+    if (data.op === "IN") {
+      query = `${data.field}${data.not === true ? " NOT " : " "}${
+        data.op
+      } (${data.value.map((_) => `$${index++}`).join(", ")})`;
+
+      values.push(...data.value);
+    } else {
+      query = `${data.field}${data.not === true ? " NOT " : " "}${
+        data.op
+      } $${index++}`;
+
+      values.push(data.value);
+    }
+  }
+  return {
+    query: query,
+    values: values,
+    index: index,
+  };
 };
