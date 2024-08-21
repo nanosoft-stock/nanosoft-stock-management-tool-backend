@@ -38,7 +38,7 @@ export const getStock = async (itemId, executeQuery) => {
   query += " FROM stocks ";
   query += joinClauses.join(" ");
   query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
-  query += " WHERE stocks.item_id = $1;";
+  query += " WHERE stocks.item_id = $1";
 
   const values = [itemId];
 
@@ -72,7 +72,7 @@ export const getAllStocks = async (executeQuery) => {
   query += " FROM stocks ";
   query += joinClauses.join(" ");
   query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
-  query += "ORDER BY stocks.date DESC, stocks.item_id DESC LIMIT 100;";
+  query += "ORDER BY stocks.date DESC, stocks.item_id DESC LIMIT 100";
 
   const values = [];
 
@@ -126,7 +126,7 @@ export const addStock = async (stock, executeQuery) => {
   categoryBasedQuery += Object.keys(categoryBasedColumns)
     .map((_) => `$${index++}`)
     .join(", ");
-  categoryBasedQuery += ");";
+  categoryBasedQuery += ")";
 
   categoryBasedValues.push(...Object.values(categoryBasedColumns));
 
@@ -147,84 +147,101 @@ export const queryStocks = async (q, executeQuery) => {
     offset,
   } = q;
 
+  // SELECT
   let query = "SELECT ";
   let values = [];
   let index = 1;
 
+  // DISTINCT
   if (distinct !== undefined && distinct !== false) {
     query += "DISTINCT ";
   }
 
+  // COUNT(*) OR COLUMNS
   if (count !== undefined && count !== false) {
     query += "COUNT(*)";
   } else {
     query += columns.join(", ");
   }
 
+  // FROM
   query += " FROM stocks ";
 
+  // JOIN
   if (join !== undefined && join.length > 0) {
-    query += join
-      .map(
-        (j) =>
-          `${j.type.toUpperCase()} JOIN ${j.table} ON stocks.${j.field} = ${
-            j.table
-          }.${j.field}`
-      )
-      .join(" ");
+    query += buildJoinClause(join);
   }
 
+  // WHERE
   if (where !== undefined && Object.keys(where).length > 0) {
-    query += " WHERE ";
+    query += "WHERE ";
     let w = buildWhereClause(where, values, index);
-    console.log(w);
-    query += w.query;
+    query += w.query + " ";
     values = w.values;
     index = w.index;
   }
 
+  // ORDER BY
   if (orderBy !== undefined && orderBy.length > 0) {
-    query += " ORDER BY ";
-    query += orderBy.map((o) => `${o.field} ${o.direction}`).join(", ");
+    query += "ORDER BY ";
+    query += orderBy.map((o) => `${o.field} ${o.direction}`).join(", ") + " ";
   }
 
+  // LIMIT
   if (limit !== undefined) {
-    query += ` LIMIT ${limit}`;
+    query += `LIMIT ${limit} `;
   }
 
+  // OFFSET
   if (offset !== undefined) {
-    query += ` OFFSET ${offset}`;
+    query += `OFFSET ${offset} `;
   }
-
-  query += ";";
-
-  console.log(query, values);
 
   return { query, values };
 };
 
+const buildJoinClause = (join) => {
+  let query = "";
+
+  for (let i = 0; i < join.length; i++) {
+    const j = join[i];
+
+    query += `${j.type} JOIN ${j.table} ON stocks.${j.field} = ${j.table}.${j.field} `;
+  }
+
+  return query;
+};
+
 const buildWhereClause = (where, values, index) => {
   let query = "";
+
   if (where.type === "AND") {
     let ands = [];
+
     for (let i = 0; i < where.nodes.length; i++) {
       let w = buildWhereClause(where.nodes[i], values, index);
+
       ands.push(w.query);
       values = w.values;
       index = w.index;
     }
+
     query = "(" + ands.join(" AND ") + ")";
   } else if (where.type === "OR") {
     let ors = [];
+
     for (let i = 0; i < where.nodes.length; i++) {
       let w = buildWhereClause(where.nodes[i], values, index);
+
       ors.push(w.query);
       values = w.values;
       index = w.index;
     }
+
     query = "(" + ors.join(" OR ") + ")";
   } else {
     let data = where.data;
+
     if (data.op === "IN") {
       query = `${data.field}${data.not === true ? " NOT " : " "}${
         data.op
@@ -239,6 +256,7 @@ const buildWhereClause = (where, values, index) => {
       values.push(data.value);
     }
   }
+
   return {
     query: query,
     values: values,

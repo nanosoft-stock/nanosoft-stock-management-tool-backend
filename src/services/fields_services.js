@@ -62,7 +62,5 @@ export const deleteFields = (fields) => {
   let query = "DELETE FROM fields WHERE field_uuid = ANY($1) RETURNING *;";
   const values = [fields];
 
-  console.log(query, values);
-
   return { query, values };
 };
