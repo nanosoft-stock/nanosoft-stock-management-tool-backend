@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS docking_station_specifications(
 
 CREATE TABLE IF NOT EXISTS stock_location_history(
     date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    slh_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    slh_uid UUID NOT NULL DEFAULT gen_random_uuid(),
     group_uid UUID,
     items VARCHAR(10)[] NOT NULL,
     container_id VARCHAR(10) NOT NULL,
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS stock_location_history(
     status VARCHAR(10) NOT NULL,
     user_uuid UUID NOT NULL,
 
-    PRIMARY KEY (slh_id),
+    PRIMARY KEY (slh_uid),
     FOREIGN KEY (container_id) REFERENCES containers(container_id),
     FOREIGN KEY (warehouse_location_id) REFERENCES warehouse_locations(warehouse_location_id),
     FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
