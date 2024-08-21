@@ -416,7 +416,7 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_item_ids
 
 
 CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT) RETURNS TABLE (
-    item_id VARCHAR(10),
+    item_id VARCHAR(10)
 ) AS $$
     BEGIN
         RETURN QUERY
@@ -443,7 +443,7 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_container_ids
     CACHE 100;
 
 
-CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURN TABLE (
+CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
     container_id VARCHAR(10)
 ) AS $$
     BEGIN
@@ -453,7 +453,7 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURN TABLE (
             FROM
                 generate_series(1, $1);
     END
-    $$ LANGUAGE plpgsql
+    $$ LANGUAGE plpgsql;
 
 
 -- SELECT setval('sq_generate_container_ids', 0::INT, false);
@@ -539,21 +539,21 @@ CREATE OR REPLACE TRIGGER tg_new_warehouse_location_added
 
 
 -- Auto update item's container loc and warehouse loc and update container's loc
-CREATE OR REPLACE FUNCTION fn_item_location_updated() RETURN TRIGGER AS $$
+CREATE OR REPLACE FUNCTION fn_item_location_updated() RETURNS TRIGGER AS $$
     DECLARE
         element VARCHAR(10);
     BEGIN
         IF 
             NEW.status = 'completed'
         THEN
-            FOR element IN ARRAY NEW.items
+            FOREACH element IN ARRAY NEW.items
             LOOP
-                UPDATE stocks SET (container_id = NEW.container_id, warehouse_location_id = NEW.warehouse_location_id) WHERE item_id = element;
+                UPDATE stocks SET container_id = NEW.container_id, warehouse_location_id = NEW.warehouse_location_id WHERE item_id = element;
 
                 IF 
                     (SELECT warehouse_location_id FROM containers WHERE container_id = NEW.container_id) <> NEW.warehouse_location_id
                 THEN
-                    UPDATE containers SET (warehouse_location_id = NEW.warehouse_location_id) WHERE container_id = NEW.container_id;
+                    UPDATE containers SET warehouse_location_id = NEW.warehouse_location_id WHERE container_id = NEW.container_id;
                 END IF;
 
             END LOOP;
