@@ -1,43 +1,47 @@
-export const getItem = (itemId) => {
-  const query = "SELECT * FROM items WHERE item_id = $1;";
+import { executeQuery } from "../config/db.js";
+
+export const getItem = async (itemId) => {
+  const query = "SELECT * FROM items WHERE item_id = $1";
   const values = [itemId];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const getAllItems = () => {
-  const query = "SELECT * FROM items ORDER BY item_id;";
+export const getAllItems = async () => {
+  const query = "SELECT * FROM items ORDER BY item_id";
   const values = [];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const addItem = (item) => {
+export const addItem = async (item) => {
   const keys = Object.keys(item);
 
-  let query = "INSERT INTO items (";
+  let query = "INSERT INTO items ";
   const values = [];
 
-  query += keys.join(", ");
-  query += ") VALUES ";
+  query += "(" + keys.join(", ") + ")";
+  query += " VALUES ";
 
   let index = 1;
   query += "(" + keys.map((_) => `$${index++}`).join(", ") + ")";
   values.push(...Object.values(item));
 
-  query += " RETURNING *;";
-
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const addItems = (items) => {
+export const addItems = async (items) => {
   const keys = Object.keys(items[0]);
 
-  let query = "INSERT INTO items (";
+  let query = "INSERT INTO items ";
   const values = [];
 
-  query += keys.join(", ");
-  query += ") VALUES ";
+  query += "(" + keys.join(", ") + ")";
+  query += " VALUES ";
 
   let index = 1;
   const insertStatements = [];
@@ -46,18 +50,15 @@ export const addItems = (items) => {
     insertStatements.push(
       "(" + keys.map((_) => `$${index++}`).join(", ") + ")"
     );
-    for (let key of keys) {
-      values.push(item[key]);
-    }
+    values.push(...Object.values(item));
   }
 
   query += insertStatements.join(", ");
-  query += " RETURNING *;";
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const updateItem = (item) => {
+export const updateItem = async (item) => {
   const { item_id: itemId, ...data } = item;
   let keys = Object.keys(data);
 
@@ -68,28 +69,26 @@ export const updateItem = (item) => {
   query += keys.map((key) => `${key} = $${index++}`).join(", ");
   values.push(...Object.values(data));
 
-  query += ` WHERE item_id = $${index} RETURNING *;`;
+  query += ` WHERE item_id = $${index}`;
   values.push(itemId);
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteItem = (item) => {
-  const query = "DELETE FROM items WHERE item_id = $1 RETURNING *;";
+export const deleteItem = async (item) => {
+  const query = "DELETE FROM items WHERE item_id = $1";
   const values = [item.item_id];
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteItems = (items) => {
-  let index = 1;
-  let query = "DELETE FROM items WHERE item_id IN (";
+export const deleteItems = async (items) => {
+  let query = "DELETE FROM items WHERE item_id IN ";
   const values = [];
+  let index = 1;
 
-  query += items.map((_) => `$${index++}`).join(", ");
+  query += "(" + items.map((_) => `$${index++}`).join(", ") + ")";
   values.push(...items.map((item) => item.item_id));
 
-  query += ") RETURNING *;";
-
-  return { query, values };
+  await executeQuery(query, values);
 };

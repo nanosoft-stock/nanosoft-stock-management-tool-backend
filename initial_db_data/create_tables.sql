@@ -166,45 +166,19 @@ CREATE TABLE IF NOT EXISTS docking_station_specifications(
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 
--- CREATE TABLE IF NOT EXISTS stock_update_history(
---     date TIMESTAMPTZ NOT NULL,
---     suh_uid UUID NOT NULL DEFAULT gen_random_uuid(),
---     category_uuid UUID NOT NULL,
---     sku_uuid UUID,
---     serial_number VARCHAR(50),
---     item_id VARCHAR(10) NOT NULL,
---     specifications JSONB NOT NULL,
---     comments VARCHAR(255),
---     user_uuid UUID NOT NULL,
--- 
---     PRIMARY KEY (suh_uid, item_id, category_uuid),
---     UNIQUE(serial_number, category_uuid),
---     FOREIGN KEY (category_uuid) REFERENCES categories(category_uuid),
---     FOREIGN KEY (sku_uuid) REFERENCES skus(sku_uuid),
---     FOREIGN KEY (item_id) REFERENCES items(item_id),
---     FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
--- ) PARTITION BY LIST (category_uuid);
+CREATE TABLE IF NOT EXISTS stock_location_history(
+    date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    slh_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+    group_uuid UUID,
+    items VARCHAR(10)[] NOT NULL,
+    container_id VARCHAR(10) NOT NULL,
+    warehouse_location_id VARCHAR(20) NOT NULL,
+    move_type VARCHAR(10) NOT NULL,
+    status VARCHAR(10) NOT NULL,
+    user_uuid UUID NOT NULL,
 
--- CREATE TABLE IF NOT EXISTS stock_location_history(
---     date TIMESTAMPTZ NOT NULL,
---     slh_uid UUID NOT NULL DEFAULT gen_random_uuid(),
---     group_id UUID NOT NULL,
---     items VARCHAR(10)[] NOT NULL,
---     container_id VARCHAR(10) NOT NULL,
---     warehouse_location_id VARCHAR(20) NOT NULL,
---     move_type VARCHAR(10) NOT NULL,
---     status VARCHAR(10) NOT NULL,
---     user_uuid UUID NOT NULL,
--- 
---     PRIMARY KEY (slh_uid),
---     FOREIGN KEY (container_id) REFERENCES containers(container_id),
---     FOREIGN KEY (warehouse_location_id) REFERENCES warehouse_locations(warehouse_location_id),
---     FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
--- );
-
--- CREATE TABLE IF NOT EXISTS docking_station_stocks PARTITION OF stocks FOR VALUES IN ('a4652464-c47e-4c18-8613-1098182c1efe');
--- CREATE TABLE IF NOT EXISTS laptop_stocks PARTITION OF stocks FOR VALUES IN ('cb3cd149-d911-4469-a236-8e9a1d69aa66');
--- CREATE TABLE IF NOT EXISTS tft_stocks PARTITION OF stocks FOR VALUES IN ('74963032-a237-4d97-8946-90c8200e8e30');
--- CREATE TABLE IF NOT EXISTS docking_station_stock_update_history PARTITION OF stock_update_history FOR VALUES IN ('a4652464-c47e-4c18-8613-1098182c1efe');
--- CREATE TABLE IF NOT EXISTS laptop_stock_update_history PARTITION OF stock_update_history FOR VALUES IN ('cb3cd149-d911-4469-a236-8e9a1d69aa66');
--- CREATE TABLE IF NOT EXISTS tft_stock_update_history PARTITION OF stock_update_history FOR VALUES IN ('74963032-a237-4d97-8946-90c8200e8e30');
+    PRIMARY KEY (slh_uuid),
+    FOREIGN KEY (container_id) REFERENCES containers(container_id),
+    FOREIGN KEY (warehouse_location_id) REFERENCES warehouse_locations(warehouse_location_id),
+    FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
+);

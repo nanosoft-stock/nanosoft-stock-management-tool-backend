@@ -1,10 +1,8 @@
-import { executeQuery } from "../config/db.js";
 import * as fieldsService from "../services/fields_services.js";
 
 export const getAllFields = async (req, res) => {
   try {
-    const { query, values } = fieldsService.getAllFields();
-    const result = await executeQuery(query, values);
+    const result = await fieldsService.getAllFields();
 
     res.status(200).json(result);
   } catch (error) {
@@ -16,8 +14,7 @@ export const getCategoryFields = async (req, res) => {
   try {
     const category = req.params.category;
 
-    const { query, values } = fieldsService.getCategoryFields(category);
-    const result = await executeQuery(query, values);
+    const result = await fieldsService.getCategoryFields(category);
 
     res.status(200).json(result);
   } catch (error) {
@@ -29,10 +26,9 @@ export const addFields = async (req, res) => {
   try {
     const { data: fields } = req.body;
 
-    const { query, values } = fieldsService.addFields(fields);
-    const result = await executeQuery(query, values);
+    await fieldsService.addFields(fields);
 
-    res.status(201).json(result);
+    res.status(201).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -43,13 +39,9 @@ export const updateFields = async (req, res) => {
     const { data: fields } = req.body;
     const result = [];
 
-    for (let field of fields) {
-      const { field_uuid: fieldUUID, ...data } = field;
-      const { query, values } = fieldsService.updateField(fieldUUID, data);
-      result.push(...(await executeQuery(query, values)));
-    }
+    await Promise.all(fields.map((field) => fieldsService.updateField(field)));
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,10 +51,9 @@ export const deleteFields = async (req, res) => {
   try {
     const { data: fields } = req.body;
 
-    const { query, values } = fieldsService.deleteFields(fields);
-    const result = await executeQuery(query, values);
+    await fieldsService.deleteFields(fields);
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
