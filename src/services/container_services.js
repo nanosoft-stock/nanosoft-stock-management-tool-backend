@@ -1,43 +1,47 @@
-export const getContainer = (containerId) => {
-  const query = "SELECT * FROM containers WHERE container_id = $1;";
+import { executeQuery } from "../config/db.js";
+
+export const getContainer = async (containerId) => {
+  const query = "SELECT * FROM containers WHERE container_id = $1";
   const values = [containerId];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const getAllContainers = () => {
-  const query = "SELECT * FROM containers ORDER BY container_id;";
+export const getAllContainers = async () => {
+  const query = "SELECT * FROM containers ORDER BY container_id";
   const values = [];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const addContainer = (container) => {
+export const addContainer = async (container) => {
   const keys = Object.keys(container);
 
-  let query = "INSERT INTO containers (";
+  let query = "INSERT INTO containers ";
   const values = [];
 
-  query += keys.join(", ");
-  query += ") VALUES ";
+  query += "(" + keys.join(", ") + ")";
+  query += " VALUES ";
 
   let index = 1;
   query += "(" + keys.map((_) => `$${index++}`).join(", ") + ")";
   values.push(...Object.values(container));
 
-  query += " RETURNING *;";
-
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const addContainers = (containers) => {
+export const addContainers = async (containers) => {
   const keys = Object.keys(containers[0]);
 
-  let query = "INSERT INTO containers (";
+  let query = "INSERT INTO containers ";
   const values = [];
 
-  query += keys.join(", ");
-  query += ") VALUES ";
+  query += "(" + keys.join(", ") + ")";
+  query += " VALUES ";
 
   let index = 1;
   const insertStatements = [];
@@ -46,18 +50,15 @@ export const addContainers = (containers) => {
     insertStatements.push(
       "(" + keys.map((_) => `$${index++}`).join(", ") + ")"
     );
-    for (let key of keys) {
-      values.push(container[key]);
-    }
+    values.push(...Object.values(container));
   }
 
   query += insertStatements.join(", ");
-  query += " RETURNING *;";
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const updateContainer = (container) => {
+export const updateContainer = async (container) => {
   const { container_id: containerId, ...data } = container;
   let keys = Object.keys(data);
 
@@ -68,28 +69,26 @@ export const updateContainer = (container) => {
   query += keys.map((key) => `${key} = $${index++}`).join(", ");
   values.push(...Object.values(data));
 
-  query += ` WHERE container_id = $${index++} RETURNING *;`;
+  query += ` WHERE container_id = $${index++}`;
   values.push(containerId);
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteContainer = (container) => {
-  const query = "DELETE FROM containers WHERE container_id = $1 RETURNING *;";
+export const deleteContainer = async (container) => {
+  const query = "DELETE FROM containers WHERE container_id = $1";
   const values = [container.container_id];
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteContainers = (containers) => {
-  let index = 1;
-  let query = "DELETE FROM containers WHERE container_id IN (";
+export const deleteContainers = async (containers) => {
+  let query = "DELETE FROM containers WHERE container_id IN ";
   const values = [];
+  let index = 1;
 
-  query += containers.map((_) => `$${index++}`).join(", ");
+  query += "(" + containers.map((_) => `$${index++}`).join(", ") + ")";
   values.push(...containers.map((container) => container.container_id));
 
-  query += ") RETURNING *;";
-
-  return { query, values };
+  await executeQuery(query, values);
 };

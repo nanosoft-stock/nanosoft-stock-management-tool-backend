@@ -1,35 +1,40 @@
-export const getAllCategories = () => {
-  const query = "SELECT * FROM categories ORDER BY category;";
+import { executeQuery } from "../config/db.js";
+
+export const getAllCategories = async () => {
+  const query = "SELECT * FROM categories ORDER BY category";
   const values = [];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const getCategory = (category) => {
-  const query = "SELECT * FROM categories WHERE category = $1;";
+export const getCategory = async (category) => {
+  const query = "SELECT * FROM categories WHERE category = $1";
   const values = [category];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const addNewCategory = (category) => {
-  const query = "INSERT INTO categories (category) VALUES ($1) RETURNING *;";
+export const addNewCategory = async (category) => {
+  const query = "INSERT INTO categories (category) VALUES ($1)";
   const values = [category];
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const updateCategory = (oldCategory, newCategory) => {
-  const query =
-    "UPDATE categories SET category = $1 WHERE category = $2 RETURNING *;";
+export const updateCategory = async (oldCategory, newCategory) => {
+  const query = "UPDATE categories SET category = $1 WHERE category = $2";
   const values = [newCategory, oldCategory];
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteCategory = (category) => {
-  const query = "DELETE FROM categories WHERE category = $1 RETURNING *;";
+export const deleteCategory = async (category) => {
+  const query = "DELETE FROM categories WHERE category = $1";
   const values = [category];
 
-  return { query, values };
+  await executeQuery(query, values);
 };

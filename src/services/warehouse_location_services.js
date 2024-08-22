@@ -1,45 +1,49 @@
-export const getWarehouseLocation = (warehouse_location_id) => {
+import { executeQuery } from "../config/db.js";
+
+export const getWarehouseLocation = async (warehouse_location_id) => {
   const query =
-    "SELECT * FROM warehouse_locations WHERE warehouse_location_id = $1;";
+    "SELECT * FROM warehouse_locations WHERE warehouse_location_id = $1";
   const values = [warehouse_location_id];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const getAllWarehouseLocations = () => {
+export const getAllWarehouseLocations = async () => {
   const query =
-    "SELECT * FROM warehouse_locations ORDER BY warehouse_location_id;";
+    "SELECT * FROM warehouse_locations ORDER BY warehouse_location_id";
   const values = [];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return result;
 };
 
-export const addWarehouseLocation = (warehouseLocation) => {
+export const addWarehouseLocation = async (warehouseLocation) => {
   const keys = Object.keys(warehouseLocation);
 
-  let query = "INSERT INTO warehouse_locations (";
+  let query = "INSERT INTO warehouse_locations ";
   const values = [];
 
-  query += keys.join(", ");
-  query += ") VALUES ";
+  query += "(" + keys.join(", ") + ")";
+  query += " VALUES ";
 
   let index = 1;
   query += "(" + keys.map((_) => `$${index++}`).join(", ") + ")";
   values.push(...Object.values(warehouseLocation));
 
-  query += " RETURNING *;";
-
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const addWarehouseLocations = (warehouseLocations) => {
+export const addWarehouseLocations = async (warehouseLocations) => {
   const keys = Object.keys(warehouseLocations[0]);
 
-  let query = "INSERT INTO warehouse_locations (";
+  let query = "INSERT INTO warehouse_locations ";
   const values = [];
 
-  query += keys.join(", ");
-  query += ") VALUES ";
+  query += "(" + keys.join(", ") + ")";
+  query += " VALUES ";
 
   let index = 1;
   const insertStatements = [];
@@ -48,18 +52,15 @@ export const addWarehouseLocations = (warehouseLocations) => {
     insertStatements.push(
       "(" + keys.map((_) => `$${index++}`).join(", ") + ")"
     );
-    for (let key of keys) {
-      values.push(warehouseLocation[key]);
-    }
+    values.push(...Object.values(warehouseLocation));
   }
 
   query += insertStatements.join(", ");
-  query += " RETURNING *;";
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const updateWarehouseLocation = (warehouseLocation) => {
+export const updateWarehouseLocation = async (warehouseLocation) => {
   const keys = Object.keys(warehouseLocation);
 
   let query = "UPDATE warehouse_locations SET ";
@@ -69,35 +70,29 @@ export const updateWarehouseLocation = (warehouseLocation) => {
   query += keys.map((key) => `${key} = $${index++}`).join(", ");
   values.push(...Object.values(warehouseLocation));
 
-  query += " WHERE warehouse_location_id = $1 RETURNING *;";
+  query += ` WHERE warehouse_location_id = $${index++}`;
   values.push(warehouseLocation.warehouse_location_id);
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteWarehouseLocation = (warehouseLocation) => {
+export const deleteWarehouseLocation = async (warehouseLocation) => {
   const query =
-    "DELETE FROM warehouse_locations WHERE warehouse_location_id = $1 RETURNING *;";
+    "DELETE FROM warehouse_locations WHERE warehouse_location_id = $1";
   const values = [warehouseLocation.warehouse_location_id];
 
-  return { query, values };
+  await executeQuery(query, values);
 };
 
-export const deleteWarehouseLocations = (warehouseLocations) => {
+export const deleteWarehouseLocations = async (warehouseLocations) => {
+  let query = "DELETE FROM warehouse_locations WHERE warehouse_location_id IN ";
+  const values = [];
   let index = 1;
 
-  let query =
-    "DELETE FROM warehouse_locations WHERE warehouse_location_id IN (";
-  const values = [];
-
-  query += warehouseLocations.map((_) => `$${index++}`).join(", ");
+  query += "(" + warehouseLocations.map((_) => `$${index++}`).join(", ") + ")";
   values.push(
-    ...warehouseLocations.map(
-      (warehouseLocation) => warehouseLocation.warehouse_location_id
-    )
+    ...warehouseLocations.map((location) => location.warehouse_location_id)
   );
 
-  query += ") RETURNING *;";
-
-  return { query, values };
+  await executeQuery(query, values);
 };

@@ -1,12 +1,10 @@
-import { executeQuery } from "../config/db.js";
 import * as itemService from "../services/item_services.js";
 
 export const getItem = async (req, res) => {
   try {
     const itemId = req.params.itemId;
 
-    const { query, values } = itemService.getItem(itemId);
-    const result = await executeQuery(query, values);
+    const result = await itemService.getItem(itemId);
 
     res.status(200).json(result);
   } catch (error) {
@@ -16,8 +14,7 @@ export const getItem = async (req, res) => {
 
 export const getAllItems = async (req, res) => {
   try {
-    const { query, values } = itemService.getAllItems();
-    const result = await executeQuery(query, values);
+    const result = await itemService.getAllItems();
 
     res.status(200).json(result);
   } catch (error) {
@@ -29,10 +26,9 @@ export const addItem = async (req, res) => {
   try {
     const { data: item } = req.body;
 
-    const { query, values } = itemService.addItem(item);
-    const result = await executeQuery(query, values);
+    await itemService.addItem(item);
 
-    res.status(201).json(result);
+    res.status(201).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -42,10 +38,9 @@ export const addItems = async (req, res) => {
   try {
     const { data: items } = req.body;
 
-    const { query, values } = itemService.addItems(items);
-    const result = await executeQuery(query, values);
+    await itemService.addItems(items);
 
-    res.status(200).json(result);
+    res.status(201).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -53,12 +48,11 @@ export const addItems = async (req, res) => {
 
 export const updateItem = async (req, res) => {
   try {
-    const {data: item} = req.body;
+    const { data: item } = req.body;
 
-    const { query, values } = itemService.updateItem(item);
-    const result = await executeQuery(query, values);
+    await itemService.updateItem(item);
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -66,15 +60,11 @@ export const updateItem = async (req, res) => {
 
 export const updateItems = async (req, res) => {
   try {
-    const {data: items} = req.body;
-    const result = [];
+    const { data: items } = req.body;
 
-    for (let item of items) {
-      const { query, values } = itemService.updateItem(item);
-      result.push(...(await executeQuery(query, values)));
-    }
+    await Promise.all(items.map((item) => itemService.updateItem(item)));
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -82,12 +72,11 @@ export const updateItems = async (req, res) => {
 
 export const deleteItem = async (req, res) => {
   try {
-    const {data: item} = req.body;
+    const { data: item } = req.body;
 
-    const { query, values } = itemService.deleteItem(item);
-    const result = await executeQuery(query, values);
+    await itemService.deleteItem(item);
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -95,12 +84,11 @@ export const deleteItem = async (req, res) => {
 
 export const deleteItems = async (req, res) => {
   try {
-    const {data: items} = req.body;
+    const { data: items } = req.body;
 
-    const { query, values } = itemService.deleteItems(items);
-    const result = await executeQuery(query, values);
+    await itemService.deleteItems(items);
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

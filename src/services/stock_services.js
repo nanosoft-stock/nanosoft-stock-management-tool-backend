@@ -1,3 +1,7 @@
+import { executeQuery } from "../config/db.js";
+import { queryBuilderHelper } from "../helpers/query_builder_helper.js";
+import { postProcessStocks } from "../helpers/stock_helper.js";
+
 const commonColumns = [
   "date",
   "category",
@@ -11,11 +15,11 @@ const commonColumns = [
   "user_uuid",
 ];
 
-export const getStock = async (itemId, executeQuery) => {
+export const getStock = async (itemId) => {
   let query = "SELECT stocks.*, ";
 
   const categories = (
-    await executeQuery("SELECT category FROM categories;")
+    await executeQuery("SELECT category FROM categories")
   ).map((category) => category["category"]);
 
   const selectClauses = [];
@@ -23,7 +27,7 @@ export const getStock = async (itemId, executeQuery) => {
 
   for (let category of categories) {
     const category_name = category;
-    category = category.replace(/ /g, "_").toLowerCase();
+    category = category.replace(" ", "_").toLowerCase();
 
     selectClauses.push(
       `row_to_json(${category}_specifications.*) AS ${category}`
@@ -37,19 +41,21 @@ export const getStock = async (itemId, executeQuery) => {
   query += ", users.username";
   query += " FROM stocks ";
   query += joinClauses.join(" ");
-  query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
+  query += " LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid";
   query += " WHERE stocks.item_id = $1";
 
   const values = [itemId];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return postProcessStocks(result);
 };
 
-export const getAllStocks = async (executeQuery) => {
+export const getAllStocks = async () => {
   let query = "SELECT stocks.*, ";
 
   const categories = (
-    await executeQuery("SELECT category FROM categories;")
+    await executeQuery("SELECT category FROM categories")
   ).map((category) => category["category"]);
 
   const selectClauses = [];
@@ -57,7 +63,7 @@ export const getAllStocks = async (executeQuery) => {
 
   for (let category of categories) {
     const category_name = category;
-    category = category.replace(/ /g, "_").toLowerCase();
+    category = category.replace(" ", "_").toLowerCase();
 
     selectClauses.push(
       `row_to_json(${category}_specifications.*) AS ${category}`
@@ -71,15 +77,17 @@ export const getAllStocks = async (executeQuery) => {
   query += ", users.username";
   query += " FROM stocks ";
   query += joinClauses.join(" ");
-  query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid `;
-  query += "ORDER BY stocks.date DESC, stocks.item_id DESC LIMIT 100";
+  query += ` LEFT OUTER JOIN users ON stocks.user_uuid = users.user_uuid`;
+  query += " ORDER BY stocks.date DESC, stocks.item_id DESC LIMIT 100";
 
   const values = [];
 
-  return { query, values };
+  const result = await executeQuery(query, values);
+
+  return postProcessStocks(result);
 };
 
-export const addStock = async (stock, executeQuery) => {
+export const addStock = async (stock) => {
   const keys = Object.keys(stock);
 
   const stockColumns = {};
@@ -97,169 +105,138 @@ export const addStock = async (stock, executeQuery) => {
     }
   }
 
-  let stockQuery = "INSERT INTO stocks (";
+  let stockQuery = "INSERT INTO stocks ";
   const stockValues = [];
   let index = 1;
 
-  stockQuery += Object.keys(stockColumns).join(", ");
-  stockQuery += ") VALUES ";
+  stockQuery += "(" + Object.keys(stockColumns).join(", ") + ")";
+  stockQuery += " VALUES ";
 
-  stockQuery += "(";
-  stockQuery += Object.keys(stockColumns)
-    .map((_) => `$${index++}`)
-    .join(", ");
-  stockQuery += ");";
+  stockQuery +=
+    "(" +
+    Object.keys(stockColumns)
+      .map((_) => `$${index++}`)
+      .join(", ") +
+    ")";
 
   stockValues.push(...Object.values(stockColumns));
 
-  await executeQuery(stockQuery, stockValues);
-
   const categoryKey = stock.category.replace(" ", "_").toLowerCase();
-  let categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications (`;
+  let categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications `;
   const categoryBasedValues = [];
   index = 1;
 
-  categoryBasedQuery += Object.keys(categoryBasedColumns).join(", ");
-  categoryBasedQuery += ") VALUES ";
+  categoryBasedQuery +=
+    "(" + Object.keys(categoryBasedColumns).join(", ") + ")";
+  categoryBasedQuery += " VALUES ";
 
-  categoryBasedQuery += "(";
-  categoryBasedQuery += Object.keys(categoryBasedColumns)
-    .map((_) => `$${index++}`)
-    .join(", ");
-  categoryBasedQuery += ")";
+  categoryBasedQuery +=
+    "(" +
+    Object.keys(categoryBasedColumns)
+      .map((_) => `$${index++}`)
+      .join(", ") +
+    ")";
 
   categoryBasedValues.push(...Object.values(categoryBasedColumns));
 
-  await executeQuery(categoryBasedQuery, categoryBasedValues);
-
-  return await getStock(stock.item_id, executeQuery);
+  await Promise.all(
+    executeQuery(stockQuery, stockValues),
+    executeQuery(categoryBasedQuery, categoryBasedValues)
+  );
 };
 
-export const queryStocks = async (q, executeQuery) => {
-  const {
-    distinct,
-    count,
-    columns,
-    join,
-    where,
-    order_by: orderBy,
-    limit,
-    offset,
-  } = q;
+export const updateStock = async (stock) => {
+  const keys = Object.keys(stock);
 
-  // SELECT
-  let query = "SELECT ";
-  let values = [];
+  const stockColumns = {};
+  const categoryBasedColumns = {};
+  const item_id = stock.item_id;
+
+  for (let key of keys) {
+    if (key == "item_id") {
+      continue;
+    }
+
+    if (commonColumns.includes(key)) {
+      stockColumns[key] = stock[key];
+    } else {
+      categoryBasedColumns[key] = stock[key];
+    }
+  }
+
+  let stockQuery = "UPDATE stocks SET ";
+  const stockValues = [];
   let index = 1;
 
-  // DISTINCT
-  if (distinct !== undefined && distinct !== false) {
-    query += "DISTINCT ";
-  }
+  stockQuery += Object.keys(stockColumns)
+    .map((key) => `${key} = $${index++}`)
+    .join(", ");
+  stockValues.push(...Object.values(stockColumns));
 
-  // COUNT(*) OR COLUMNS
-  if (count !== undefined && count !== false) {
-    query += "COUNT(*)";
-  } else {
-    query += columns.join(", ");
-  }
+  stockQuery += ` WHERE item_id = $${index++}`;
+  stockValues.push(item_id);
 
-  // FROM
-  query += " FROM stocks ";
+  const categoryKey = stock.category.replace(" ", "_").toLowerCase();
+  let categoryBasedQuery = `UPDATE ${categoryKey}_specifications SET `;
+  const categoryBasedValues = [];
+  index = 1;
 
-  // JOIN
-  if (join !== undefined && join.length > 0) {
-    query += buildJoinClause(join);
-  }
+  categoryBasedQuery += Object.keys(categoryBasedColumns)
+    .map((key) => `${key} = $${index++}`)
+    .join(", ");
+  categoryBasedValues.push(...Object.values(categoryBasedColumns));
 
-  // WHERE
-  if (where !== undefined && Object.keys(where).length > 0) {
-    query += "WHERE ";
-    let w = buildWhereClause(where, values, index);
-    query += w.query + " ";
-    values = w.values;
-    index = w.index;
-  }
+  categoryBasedQuery += ` WHERE item_id = $${index++}`;
+  categoryBasedValues.push(item_id);
 
-  // ORDER BY
-  if (orderBy !== undefined && orderBy.length > 0) {
-    query += "ORDER BY ";
-    query += orderBy.map((o) => `${o.field} ${o.direction}`).join(", ") + " ";
-  }
-
-  // LIMIT
-  if (limit !== undefined) {
-    query += `LIMIT ${limit} `;
-  }
-
-  // OFFSET
-  if (offset !== undefined) {
-    query += `OFFSET ${offset} `;
-  }
-
-  return { query, values };
+  await Promise.all(
+    executeQuery(stockQuery, stockValues),
+    executeQuery(categoryBasedQuery, categoryBasedValues)
+  );
 };
 
-const buildJoinClause = (join) => {
-  let query = "";
+export const deleteStock = async (stock) => {
+  const stockQuery = `DELETE FROM stocks WHERE item_id = $1`;
+  const stockValues = [stock.item_id];
 
-  for (let i = 0; i < join.length; i++) {
-    const j = join[i];
+  const st = await executeQuery(stockQuery, stockValues);
 
-    query += `${j.type} JOIN ${j.table} ON stocks.${j.field} = ${j.table}.${j.field} `;
-  }
+  const categoryKey = st[0].category.replace(" ", "_").toLowerCase();
+  const categoryBasedQuery = `DELETE FROM ${categoryKey}_specifications WHERE item_id = $1`;
+  const categoryBasedValues = [stock.item_id];
 
-  return query;
+  await executeQuery(categoryBasedQuery, categoryBasedValues);
 };
 
-const buildWhereClause = (where, values, index) => {
-  let query = "";
+export const deleteStocks = async (stocks) => {
+  let index = 1;
+  let query = "DELETE FROM stocks WHERE item_id IN ";
+  const values = [];
 
-  if (where.type === "AND") {
-    let ands = [];
+  query += "(" + stocks.map((_) => `$${index++}`).join(", ") + ")";
+  values.push(...stocks.map((stock) => stock.item_id));
 
-    for (let i = 0; i < where.nodes.length; i++) {
-      let w = buildWhereClause(where.nodes[i], values, index);
+  const sts = await executeQuery(query, values);
+  const executableQueries = [];
 
-      ands.push(w.query);
-      values = w.values;
-      index = w.index;
-    }
+  for (let st of sts) {
+    const categoryKey = st.category.replace(" ", "_").toLowerCase();
 
-    query = "(" + ands.join(" AND ") + ")";
-  } else if (where.type === "OR") {
-    let ors = [];
+    const categoryBasedQuery = `DELETE FROM ${categoryKey}_specifications WHERE item_id = $1;`;
+    const categoryBasedValues = [st.item_id];
 
-    for (let i = 0; i < where.nodes.length; i++) {
-      let w = buildWhereClause(where.nodes[i], values, index);
-
-      ors.push(w.query);
-      values = w.values;
-      index = w.index;
-    }
-
-    query = "(" + ors.join(" OR ") + ")";
-  } else {
-    let data = where.data;
-
-    if (data.op === "IN") {
-      query = `${data.field}${data.not === true ? " NOT " : " "}${
-        data.op
-      } (${data.value.map((_) => `$${index++}`).join(", ")})`;
-
-      values.push(...data.value);
-    } else {
-      query = `${data.field}${data.not === true ? " NOT " : " "}${
-        data.op
-      } $${index++}`;
-
-      values.push(data.value);
-    }
+    executableQueries.addStock(
+      executeQuery(categoryBasedQuery, categoryBasedValues)
+    );
   }
 
-  return {
-    query: query,
-    values: values,
-    index: index,
-  };
+  await Promise.all(executableQueries);
+};
+
+export const queryStocks = async (q) => {
+  const { query, values } = queryBuilderHelper(q);
+
+  const result = await executeQuery(query, values);
+
+  return postProcessStocks(result);
 };

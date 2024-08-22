@@ -1,12 +1,10 @@
-import { executeQuery } from "../config/db.js";
 import * as slhService from "../services/stock_location_history_service.js";
 
 export const getStockLocationHistory = async (req, res) => {
   try {
-    const slhUid = req.params.slhUid;
+    const slhUuid = req.params.slhUuid;
 
-    const { query, values } = slhService.getStockLocationHistory(slhUid);
-    const result = await executeQuery(query, values);
+    const result = await slhService.getStockLocationHistory(slhUuid);
 
     res.status(200).json(result);
   } catch (error) {
@@ -16,8 +14,7 @@ export const getStockLocationHistory = async (req, res) => {
 
 export const getAllStockLocationHistory = async (req, res) => {
   try {
-    const { query, values } = slhService.getAllStockLocationHistory();
-    const result = await executeQuery(query, values);
+    const result = await slhService.getAllStockLocationHistory();
 
     res.status(200).json(result);
   } catch (error) {
@@ -29,10 +26,9 @@ export const addStockLocationHistory = async (req, res) => {
   try {
     const { data: history } = req.body;
 
-    const { query, values } = slhService.addStockLocationHistory(history);
-    const result = await executeQuery(query, values);
+    await slhService.addStockLocationHistory(history);
 
-    res.status(201).json(result);
+    res.status(201).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -42,10 +38,9 @@ export const addStockLocationHistories = async (req, res) => {
   try {
     const { data: histories } = req.body;
 
-    const { query, values } = slhService.addStockLocationHistories(histories);
-    const result = await executeQuery(query, values);
+    await slhService.addStockLocationHistories(histories);
 
-    res.status(200).json(result);
+    res.status(201).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -55,10 +50,9 @@ export const updateStockLocationHistory = async (req, res) => {
   try {
     const { data: history } = req.body;
 
-    const { query, values } = slhService.updateStockLocationHistory(history);
-    const result = await executeQuery(query, values);
+    await slhService.updateStockLocationHistory(history);
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -67,14 +61,12 @@ export const updateStockLocationHistory = async (req, res) => {
 export const updateStockLocationHistories = async (req, res) => {
   try {
     const { data: histories } = req.body;
-    const result = [];
 
-    for (let history of histories) {
-      const { query, values } = slhService.updateStockLocationHistory(history);
-      result.push(...(await executeQuery(query, values)));
-    }
+    await Promise.all(
+      histories.map((history) => slhService.updateStockLocationHistory(history))
+    );
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -82,12 +74,11 @@ export const updateStockLocationHistories = async (req, res) => {
 
 export const deleteStockLocationHistory = async (req, res) => {
   try {
-    const { data: slhUid } = req.body;
+    const { data: history } = req.body;
 
-    const { query, values } = slhService.deleteStockLocationHistory(slhUid);
-    const result = await executeQuery(query, values);
+    await slhService.deleteStockLocationHistory(history);
 
-    res.status(200).json(result);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -95,10 +86,21 @@ export const deleteStockLocationHistory = async (req, res) => {
 
 export const deleteStockLocationHistories = async (req, res) => {
   try {
-    const { data: slhUids } = req.body;
+    const { data: histories } = req.body;
 
-    const { query, values } = slhService.deleteStockLocationHistories(slhUids);
-    const result = await executeQuery(query, values);
+    await slhService.deleteStockLocationHistories(histories);
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const queryStockLocationHistory = async (req, res) => {
+  try {
+    const { data: q } = req.body;
+
+    const result = await slhService.queryStockLocationHistory(q);
 
     res.status(200).json(result);
   } catch (error) {

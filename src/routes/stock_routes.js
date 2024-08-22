@@ -9,7 +9,6 @@ stockRouter.route("/").get(stockController.getAllStocks);
 stockRouter.route("/").post(stockController.addStock);
 stockRouter.route("/batch").post(stockController.addStocks);
 
-// TODO : UPDATE and DELETE endpoints
 stockRouter.route("/").patch(stockController.updateStock);
 stockRouter.route("/batch").patch(stockController.updateStocks);
 
