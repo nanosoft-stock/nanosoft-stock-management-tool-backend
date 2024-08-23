@@ -35,7 +35,7 @@ INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockabl
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('display port', 'TFT', 'string', 'True', 'True', 'True', 'title', 'none', '12');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('model number', 'Laptop', 'string', 'True', 'False', 'True', 'title', 'upper', '12');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('processor', 'Laptop', 'string', 'True', 'True', 'True', 'title', 'none', '13');
-INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('user', 'Docking Station', 'string', 'False', 'True', 'True', 'title', 'title', '13');
+INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('username', 'Docking Station', 'string', 'False', 'True', 'True', 'title', 'title', '13');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('vga', 'TFT', 'string', 'True', 'True', 'True', 'upper', 'none', '13');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('ram', 'Laptop', 'string', 'True', 'True', 'True', 'upper', 'upper', '14');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('ethernet', 'TFT', 'string', 'True', 'True', 'True', 'title', 'none', '14');
@@ -49,7 +49,7 @@ INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockabl
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('webcam', 'Laptop', 'string', 'True', 'True', 'True', 'title', 'upper', '18');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('comments', 'TFT', 'string', 'False', 'False', 'True', 'title', 'none', '19');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('battery1', 'Laptop', 'string', 'False', 'True', 'True', 'title', 'upper', '19');
-INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('user', 'TFT', 'string', 'False', 'True', 'True', 'title', 'title', '20');
+INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('username', 'TFT', 'string', 'False', 'True', 'True', 'title', 'title', '20');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('battery2', 'Laptop', 'string', 'False', 'True', 'True', 'title', 'upper', '20');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('touch screen', 'Laptop', 'string', 'True', 'True', 'True', 'title', 'upper', '21');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('case grade', 'Laptop', 'string', 'False', 'True', 'True', 'title', 'upper', '22');
@@ -84,4 +84,4 @@ INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockabl
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('imei', 'Laptop', 'string', 'False', 'True', 'True', 'upper', 'upper', '51');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('supplier info', 'Laptop', 'string', 'False', 'False', 'True', 'title', 'title', '52');
 INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('works order', 'Laptop', 'string', 'False', 'False', 'True', 'title', 'title', '53');
-INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('user', 'Laptop', 'string', 'False', 'True', 'True', 'title', 'title', '54');
+INSERT INTO fields (field, category, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order) VALUES ('username', 'Laptop', 'string', 'False', 'True', 'True', 'title', 'title', '54');
