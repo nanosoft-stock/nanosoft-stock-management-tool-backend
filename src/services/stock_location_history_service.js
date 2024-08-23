@@ -62,7 +62,7 @@ export const addStockLocationHistories = async (histories) => {
 };
 
 export const updateStockLocationHistory = async (history) => {
-  const { slf_uuid: slhUuid, ...data } = history;
+  const { slh_uuid: slhUuid, ...data } = history;
   const keys = Object.keys(data);
 
   let query = "UPDATE stock_location_history SET ";
@@ -97,9 +97,11 @@ export const deleteStockLocationHistories = async (histories) => {
 };
 
 export const queryStockLocationHistory = async (q) => {
+  q["from"] = "stock_location_history";
+
   const { query, values } = queryBuilderHelper(q);
 
   const result = await executeQuery(query, values);
 
-  return postProcessStocks(result);
+  return result;
 };
