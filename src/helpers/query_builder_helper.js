@@ -3,6 +3,7 @@ export const queryBuilderHelper = (q) => {
     distinct,
     count,
     columns,
+    from,
     join,
     where,
     order_by: orderBy,
@@ -28,11 +29,11 @@ export const queryBuilderHelper = (q) => {
   }
 
   // FROM
-  query += " FROM stocks ";
+  query += ` FROM ${from} `;
 
   // JOIN
   if (join !== undefined && join.length > 0) {
-    query += buildJoinClause(join);
+    query += buildJoinClause(join, from);
   }
 
   // WHERE
@@ -63,13 +64,13 @@ export const queryBuilderHelper = (q) => {
   return { query, values };
 };
 
-const buildJoinClause = (join) => {
+const buildJoinClause = (join, from) => {
   let query = "";
 
   for (let i = 0; i < join.length; i++) {
     const j = join[i];
 
-    query += `${j.type} JOIN ${j.table} ON stocks.${j.field} = ${j.table}.${j.field} `;
+    query += `${j.type} JOIN ${j.table} ON ${from}.${j.field} = ${j.table}.${j.field} `;
   }
 
   return query;

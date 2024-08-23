@@ -544,7 +544,7 @@ CREATE OR REPLACE FUNCTION fn_item_location_updated() RETURNS TRIGGER AS $$
         element VARCHAR(10);
     BEGIN
         IF 
-            NEW.status = 'completed'
+            NEW.group_uuid IS NOT NULL AND NEW.status = 'completed'
         THEN
             FOREACH element IN ARRAY NEW.items
             LOOP

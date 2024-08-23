@@ -234,6 +234,8 @@ export const deleteStocks = async (stocks) => {
 };
 
 export const queryStocks = async (q) => {
+  q["from"] = "stocks";
+
   const { query, values } = queryBuilderHelper(q);
 
   const result = await executeQuery(query, values);
