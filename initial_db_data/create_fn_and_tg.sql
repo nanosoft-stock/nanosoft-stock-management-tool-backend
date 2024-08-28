@@ -449,7 +449,7 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
     BEGIN
         RETURN QUERY
             SELECT 
-                'ST'|| LPAD(nextval('sq_generate_container_ids'), 7,'0') AS container_id
+                'ST'|| LPAD(nextval('sq_generate_container_ids'), 7, '0') AS container_id
             FROM
                 generate_series(1, $1);
     END
@@ -465,11 +465,7 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
 -- Auto update item status
 CREATE OR REPLACE FUNCTION fn_item_stock_added() RETURNS TRIGGER AS $$
     BEGIN
-        IF 
-            OLD.status <> NEW.status
-        THEN
-            UPDATE items SET status = 'added' WHERE item_id = NEW.item_id;
-        END IF;
+        UPDATE items SET status = 'added' WHERE item_id = NEW.item_id;
 
         RETURN NEW;
     END
@@ -489,11 +485,7 @@ CREATE OR REPLACE TRIGGER tg_item_stock_added
 -- Auto update container status
 CREATE OR REPLACE FUNCTION fn_container_stock_added() RETURNS TRIGGER AS $$
     BEGIN
-        IF 
-            OLD.status <> NEW.status
-        THEN
-            UPDATE containers SET status = 'added' WHERE container_id = NEW.container_id;
-        END IF;
+        UPDATE containers SET status = 'added' WHERE container_id = NEW.container_id;
 
         RETURN NEW;
     END
