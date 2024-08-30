@@ -139,10 +139,10 @@ export const addStock = async (stock) => {
 
   categoryBasedValues.push(...Object.values(categoryBasedColumns));
 
-  await Promise.all(
+  await Promise.all([
     executeQuery(stockQuery, stockValues),
     executeQuery(categoryBasedQuery, categoryBasedValues)
-  );
+  ]);
 };
 
 export const updateStock = async (stock) => {
@@ -189,10 +189,10 @@ export const updateStock = async (stock) => {
   categoryBasedQuery += ` WHERE item_id = $${index++}`;
   categoryBasedValues.push(item_id);
 
-  await Promise.all(
+  await Promise.all([
     executeQuery(stockQuery, stockValues),
     executeQuery(categoryBasedQuery, categoryBasedValues)
-  );
+  ]);
 };
 
 export const deleteStock = async (stock) => {
@@ -225,7 +225,7 @@ export const deleteStocks = async (stocks) => {
     const categoryBasedQuery = `DELETE FROM ${categoryKey}_specifications WHERE item_id = $1;`;
     const categoryBasedValues = [st.item_id];
 
-    executableQueries.addStock(
+    executableQueries.push(
       executeQuery(categoryBasedQuery, categoryBasedValues)
     );
   }
