@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS stock_location_history(
     items VARCHAR(10)[] NOT NULL,
     container_id VARCHAR(10) NOT NULL,
     warehouse_location_id VARCHAR(20) NOT NULL,
-    move_type VARCHAR(10) NOT NULL,
+    move_type VARCHAR(20) NOT NULL,
     status VARCHAR(10) NOT NULL,
     user_uuid UUID NOT NULL,
 
