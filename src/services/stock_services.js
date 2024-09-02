@@ -141,7 +141,7 @@ export const addStock = async (stock) => {
 
   await Promise.all([
     executeQuery(stockQuery, stockValues),
-    executeQuery(categoryBasedQuery, categoryBasedValues)
+    executeQuery(categoryBasedQuery, categoryBasedValues),
   ]);
 };
 
@@ -191,7 +191,7 @@ export const updateStock = async (stock) => {
 
   await Promise.all([
     executeQuery(stockQuery, stockValues),
-    executeQuery(categoryBasedQuery, categoryBasedValues)
+    executeQuery(categoryBasedQuery, categoryBasedValues),
   ]);
 };
 

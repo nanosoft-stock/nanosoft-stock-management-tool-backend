@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS skus (
 );
 
 CREATE TABLE IF NOT EXISTS stocks (
-    date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     category VARCHAR(20) NOT NULL,
     sku_uuid UUID,
     serial_number VARCHAR(50),
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS docking_station_specifications(
 );
 
 CREATE TABLE IF NOT EXISTS stock_location_history(
-    date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     slh_uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     group_uuid UUID,
     items VARCHAR(10)[] NOT NULL,

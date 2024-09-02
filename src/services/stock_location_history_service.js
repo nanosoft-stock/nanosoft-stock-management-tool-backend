@@ -13,7 +13,7 @@ export const getStockLocationHistory = async (slhUuid) => {
 
 export const getAllStockLocationHistory = async () => {
   const query =
-    "SELECT stock_location_history.*, users.username FROM stock_location_history LEFT OUTER JOIN users ON stock_location_history.user_uuid = users.user_uuid ORDER BY date DESC;";
+    "SELECT stock_location_history.*, users.username FROM stock_location_history LEFT OUTER JOIN users ON stock_location_history.user_uuid = users.user_uuid ORDER BY date DESC, item_id DESC;";
   const values = [];
 
   const result = await executeQuery(query, values);
