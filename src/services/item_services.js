@@ -92,3 +92,17 @@ export const deleteItems = async (items) => {
 
   await executeQuery(query, values);
 };
+
+export const generateNewItems = async (count) => {
+  let query = "SELECT fn_generate_item_ids($1)";
+  const values = [count];
+
+  return await executeQuery(query, values);
+};
+
+export const deleteGeneratedItems = async (start, end) => {
+  let query = "SELECT fn_delete_item_ids($1, $2)";
+  const values = [start, end];
+
+  await executeQuery(query, values);
+};

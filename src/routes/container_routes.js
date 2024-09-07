@@ -15,4 +15,7 @@ containerRouter.route("/batch").patch(containerController.updateContainers);
 containerRouter.route("/").delete(containerController.deleteContainer);
 containerRouter.route("/batch").delete(containerController.deleteContainers);
 
+containerRouter.route("/generate").post(containerController.generateNewContainers);
+containerRouter.route("/generate").delete(containerController.deleteGeneratedContainers);
+
 export default containerRouter;

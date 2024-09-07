@@ -92,3 +92,17 @@ export const deleteContainers = async (containers) => {
 
   await executeQuery(query, values);
 };
+
+export const generateNewContainers = async (count) => {
+  let query = "SELECT fn_generate_container_ids($1)";
+  const values = [count];
+
+  return await executeQuery(query, values);
+};
+
+export const deleteGeneratedContainers = async (start, end) => {
+  let query = "SELECT fn_delete_container_ids($1, $2)";
+  const values = [start, end];
+
+  await executeQuery(query, values);
+};

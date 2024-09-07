@@ -95,3 +95,27 @@ export const deleteContainers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const generateNewContainers = async (req, res) => {
+  try {
+    const { count } = req.body.data;
+
+    const result = await containerService.generateNewContainers(count);
+
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteGeneratedContainers = async (req, res) => {
+  try {
+    const { start, end } = req.body.data;
+
+    await containerService.deleteGeneratedContainers(start, end);
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

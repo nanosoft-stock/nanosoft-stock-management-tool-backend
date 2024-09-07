@@ -15,4 +15,7 @@ itemRouter.route("/batch").patch(itemController.updateItems);
 itemRouter.route("/").delete(itemController.deleteItem);
 itemRouter.route("/batch").delete(itemController.deleteItems);
 
+itemRouter.route("/generate").post(itemController.generateNewItems);
+itemRouter.route("/generate").delete(itemController.deleteGeneratedItems);
+
 export default itemRouter;
