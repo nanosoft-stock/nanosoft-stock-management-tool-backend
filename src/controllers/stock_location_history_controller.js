@@ -62,9 +62,9 @@ export const updateStockLocationHistories = async (req, res) => {
   try {
     const { data: histories } = req.body;
 
-    await Promise.all(
-      histories.map((history) => slhService.updateStockLocationHistory(history))
-    );
+    for (const history of histories) {
+      await slhService.updateStockLocationHistory(history);
+    }
 
     res.status(204).send();
   } catch (error) {

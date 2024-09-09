@@ -121,6 +121,8 @@ export const addStock = async (stock) => {
 
   stockValues.push(...Object.values(stockColumns));
 
+  await executeQuery(stockQuery, stockValues);
+
   const categoryKey = stock.category.replace(" ", "_").toLowerCase();
   let categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications `;
   const categoryBasedValues = [];
@@ -139,10 +141,7 @@ export const addStock = async (stock) => {
 
   categoryBasedValues.push(...Object.values(categoryBasedColumns));
 
-  await Promise.all([
-    executeQuery(stockQuery, stockValues),
-    executeQuery(categoryBasedQuery, categoryBasedValues),
-  ]);
+  await executeQuery(categoryBasedQuery, categoryBasedValues);
 };
 
 export const updateStock = async (stock) => {
@@ -176,6 +175,8 @@ export const updateStock = async (stock) => {
   stockQuery += ` WHERE item_id = $${index++}`;
   stockValues.push(item_id);
 
+  await executeQuery(stockQuery, stockValues);
+
   const categoryKey = stock.category.replace(" ", "_").toLowerCase();
   let categoryBasedQuery = `UPDATE ${categoryKey}_specifications SET `;
   const categoryBasedValues = [];
@@ -189,10 +190,7 @@ export const updateStock = async (stock) => {
   categoryBasedQuery += ` WHERE item_id = $${index++}`;
   categoryBasedValues.push(item_id);
 
-  await Promise.all([
-    executeQuery(stockQuery, stockValues),
-    executeQuery(categoryBasedQuery, categoryBasedValues),
-  ]);
+  await executeQuery(categoryBasedQuery, categoryBasedValues);
 };
 
 export const deleteStock = async (stock) => {
@@ -217,7 +215,6 @@ export const deleteStocks = async (stocks) => {
   values.push(...stocks.map((stock) => stock.item_id));
 
   const sts = await executeQuery(query, values);
-  const executableQueries = [];
 
   for (let st of sts) {
     const categoryKey = st.category.replace(" ", "_").toLowerCase();
@@ -225,12 +222,8 @@ export const deleteStocks = async (stocks) => {
     const categoryBasedQuery = `DELETE FROM ${categoryKey}_specifications WHERE item_id = $1;`;
     const categoryBasedValues = [st.item_id];
 
-    executableQueries.push(
-      executeQuery(categoryBasedQuery, categoryBasedValues)
-    );
+    await executeQuery(categoryBasedQuery, categoryBasedValues);
   }
-
-  await Promise.all(executableQueries);
 };
 
 export const queryStocks = async (q) => {

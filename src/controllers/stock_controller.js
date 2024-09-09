@@ -38,12 +38,13 @@ export const addStocks = async (req, res) => {
   try {
     const { data: stocks } = req.body;
 
-    await Promise.all(
-      stocks.map(async (stock) => stockService.addStock(stock))
-    );
+    for (const stock of stocks) {
+      await stockService.addStock(stock);
+    }
 
     res.status(201).send();
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -64,9 +65,9 @@ export const updateStocks = async (req, res) => {
   try {
     const { data: stocks } = req.body;
 
-    await Promise.all(
-      stocks.map(async (stock) => stockService.updateStock(stock))
-    );
+    for (const stock of stocks) {
+      await stockService.addStock(stock);
+    }
 
     res.status(204).send();
   } catch (error) {
