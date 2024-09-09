@@ -411,24 +411,52 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_item_ids
     AS INT
     INCREMENT BY 1
     MINVALUE 10000001
-    MAXVALUE 99999999
-    CACHE 100;
+    MAXVALUE 99999999;
 
 
 CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT) RETURNS TABLE (
     item_id VARCHAR(10)
 ) AS $$
+    DECLARE
+        item_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
+        row RECORD;
     BEGIN
-        RETURN QUERY
+        FOR row IN 
             SELECT 
-                nextval('sq_generate_item_ids')::VARCHAR(10) AS item_id
+                nextval('sq_generate_item_ids')::VARCHAR(10) AS item_id 
             FROM 
-                generate_series(1, $1);
+                generate_series(1, $1)
+        LOOP
+            INSERT INTO items (item_id, status) VALUES (row.item_id, 'chosen');
+            item_ids := item_ids || row.item_id;
+        END LOOP;
+
+        RETURN QUERY 
+            SELECT unnest(item_ids) AS item_id;
     END
     $$ LANGUAGE plpgsql;
 
 
--- SELECT setval('sq_generate_item_ids', 10000000::INT, false);
+CREATE OR REPLACE FUNCTION fn_delete_item_ids(VARCHAR, VARCHAR) RETURNS VOID
+AS $$
+    DECLARE
+        last_gen_item_id VARCHAR(10);
+    BEGIN
+        SELECT 
+            last_value::VARCHAR(10) INTO last_gen_item_id
+        FROM
+            sq_generate_item_ids;
+
+        IF 
+            last_gen_item_id = $2
+        THEN
+            PERFORM setval('sq_generate_item_ids', $1::INT - 1, true);
+            DELETE FROM items WHERE item_id >= $1 AND item_id <= $2;
+        ELSE
+            UPDATE items SET status = 'unused' WHERE item_id >= $1 AND item_id <= $2;
+        END IF;
+    END;
+    $$ LANGUAGE plpgsql;
 
 
 -------------------------------------------------------------------------------
@@ -439,24 +467,52 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_container_ids
     AS INT
     INCREMENT BY 1
     MINVALUE 0
-    MAXVALUE 9999999
-    CACHE 100;
+    MAXVALUE 9999999;
 
 
 CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
     container_id VARCHAR(10)
 ) AS $$
+    DECLARE
+        container_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
+        row RECORD;
     BEGIN
-        RETURN QUERY
+        FOR row IN
             SELECT 
-                'ST'|| LPAD(nextval('sq_generate_container_ids'), 7, '0') AS container_id
+                ('ST' || LPAD(nextval('sq_generate_container_ids')::VARCHAR(10), 7, '0'))::VARCHAR(10) AS container_id
             FROM
-                generate_series(1, $1);
+                generate_series(1, $1)
+        LOOP
+            INSERT INTO containers(container_id, warehouse_location_id, status) VALUES (row.container_id, 'PSEUDO', 'chosen');
+            container_ids := container_ids || row.container_id;
+        END LOOP;
+
+        RETURN QUERY
+            SELECT unnest(container_ids) as container_id;
     END
     $$ LANGUAGE plpgsql;
 
 
--- SELECT setval('sq_generate_container_ids', 0::INT, false);
+CREATE OR REPLACE FUNCTION fn_delete_container_ids(VARCHAR, VARCHAR) RETURNS VOID
+AS $$
+    DECLARE
+        last_gen_container_id VARCHAR(10);
+    BEGIN
+        SELECT 
+            ('ST' || LPAD(last_value::VARCHAR(10), 7, '0'))::VARCHAR(10) INTO last_gen_container_id
+        FROM
+            sq_generate_container_ids;
+
+        IF 
+            last_gen_container_id = $2 
+        THEN
+            PERFORM setval('sq_generate_container_ids', REGEXP_REPLACE($1, '[^0-9]', '', 'g')::INT - 1, true);
+            DELETE FROM containers WHERE container_id >= $1 AND container_id <= $2;
+        ELSE
+            UPDATE containers SET status = 'unused' WHERE container_id >= $1 AND container_id <= $2;
+        END IF;
+    END;
+    $$ LANGUAGE plpgsql;
 
 
 -------------------------------------------------------------------------------
@@ -464,8 +520,16 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
 
 -- Auto update item status
 CREATE OR REPLACE FUNCTION fn_item_stock_added() RETURNS TRIGGER AS $$
+    DECLARE
+        old_status VARCHAR(10);
     BEGIN
-        UPDATE items SET status = 'added' WHERE item_id = NEW.item_id;
+        SELECT status INTO old_status FROM items WHERE item_id = NEW.item_id;
+
+        IF 
+            old_status != 'added' 
+        THEN
+            UPDATE items SET status = 'added' WHERE item_id = NEW.item_id;
+        END IF;
 
         RETURN NEW;
     END
@@ -484,8 +548,16 @@ CREATE OR REPLACE TRIGGER tg_item_stock_added
 
 -- Auto update container status
 CREATE OR REPLACE FUNCTION fn_container_stock_added() RETURNS TRIGGER AS $$
+    DECLARE
+        old_status VARCHAR(10);
     BEGIN
-        UPDATE containers SET status = 'added' WHERE container_id = NEW.container_id;
+        SELECT status INTO old_status FROM containers WHERE container_id = NEW.container_id;
+
+        IF 
+            old_status != 'added' 
+        THEN
+            UPDATE containers SET status = 'added' WHERE container_id = NEW.container_id;
+        END IF;
 
         RETURN NEW;
     END
@@ -502,17 +574,17 @@ CREATE OR REPLACE TRIGGER tg_container_stock_added
 -------------------------------------------------------------------------------
 
 
--- Auto create new warehouse location
-CREATE OR REPLACE FUNCTION fn_new_warehouse_location_added() RETURNS TRIGGER AS $$
+-- Auto update warehouse location status
+CREATE OR REPLACE FUNCTION fn_warehouse_location_stock_added() RETURNS TRIGGER AS $$
+    DECLARE
+        old_status VARCHAR(10);
     BEGIN
+        SELECT status INTO old_status FROM warehouse_locations WHERE warehouse_location_id = NEW.warehouse_location_id;
+
         IF 
-            NEW.status = 'completed'
+            old_status != 'added' 
         THEN
-            IF 
-                (SELECT COUNT(*) FROM warehouse_locations WHERE warehouse_location_id = NEW.warehouse_location_id) = 0 
-            THEN
-                INSERT INTO warehouse_locations(warehouse_location_id) VALUES (NEW.warehouse_location_id);
-            END IF;
+            UPDATE warehouse_locations SET status = 'added' WHERE warehouse_location_id = NEW.warehouse_location_id;
         END IF;
 
         RETURN NEW;
@@ -520,11 +592,11 @@ CREATE OR REPLACE FUNCTION fn_new_warehouse_location_added() RETURNS TRIGGER AS 
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_new_warehouse_location_added
-    AFTER INSERT OR UPDATE
-    ON stock_location_history
+CREATE OR REPLACE TRIGGER tg_warehouse_location_stock_added
+    AFTER INSERT
+    ON stocks
     FOR EACH ROW
-        EXECUTE PROCEDURE fn_new_warehouse_location_added();
+        EXECUTE PROCEDURE fn_warehouse_location_stock_added();
 
 
 -------------------------------------------------------------------------------

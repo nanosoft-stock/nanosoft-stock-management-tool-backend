@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS warehouse_locations (
     warehouse_location_id VARCHAR(20) NOT NULL,
+    status VARCHAR(10),
 
     PRIMARY KEY (warehouse_location_id)
 );
