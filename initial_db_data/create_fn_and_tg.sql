@@ -1,29 +1,39 @@
 CREATE OR REPLACE FUNCTION fn_users_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(users_view) INTO view_data FROM users_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(users_view) INTO view_data FROM users_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_users_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_users_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON users
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_users_notify_event();
+        
+
+CREATE OR REPLACE TRIGGER tg_users_delete
+    BEFORE DELETE
     ON users
     FOR EACH ROW
         EXECUTE PROCEDURE fn_users_notify_event();
@@ -34,30 +44,40 @@ CREATE OR REPLACE TRIGGER tg_users_update
 
 CREATE OR REPLACE FUNCTION fn_categories_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(categories_view) INTO view_data FROM categories_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(categories_view) INTO view_data FROM categories_view WHERE id = NEW.id;
+        END IF;
+        
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_categories_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_categories_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON categories
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_categories_notify_event();
+        
+        
+CREATE OR REPLACE TRIGGER tg_categories_delete
+    BEFORE DELETE
     ON categories
     FOR EACH ROW
         EXECUTE PROCEDURE fn_categories_notify_event();
@@ -68,30 +88,40 @@ CREATE OR REPLACE TRIGGER tg_categories_update
 
 CREATE OR REPLACE FUNCTION fn_warehouse_locations_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(warehouse_locations_view) INTO view_data FROM warehouse_locations_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(warehouse_locations_view) INTO view_data FROM warehouse_locations_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_warehouse_locations_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_warehouse_locations_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON warehouse_locations
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_warehouse_locations_notify_event();
+    
+
+CREATE OR REPLACE TRIGGER tg_warehouse_locations_delete
+    BEFORE DELETE
     ON warehouse_locations
     FOR EACH ROW
         EXECUTE PROCEDURE fn_warehouse_locations_notify_event();
@@ -102,30 +132,40 @@ CREATE OR REPLACE TRIGGER tg_warehouse_locations_update
 
 CREATE OR REPLACE FUNCTION fn_containers_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(containers_view) INTO view_data FROM containers_view WHERE containers_view.id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(containers_view) INTO view_data FROM containers_view WHERE containers_view.id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_containers_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_containers_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON containers
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_containers_notify_event();
+        
+
+CREATE OR REPLACE TRIGGER tg_containers_delete
+    BEFORE DELETE
     ON containers
     FOR EACH ROW
         EXECUTE PROCEDURE fn_containers_notify_event();
@@ -136,30 +176,40 @@ CREATE OR REPLACE TRIGGER tg_containers_update
 
 CREATE OR REPLACE FUNCTION fn_items_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(items_view) INTO view_data FROM items_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(items_view) INTO view_data FROM items_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_items_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_items_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON items
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_items_notify_event();
+
+
+CREATE OR REPLACE TRIGGER tg_items_delete
+    BEFORE DELETE
     ON items
     FOR EACH ROW
         EXECUTE PROCEDURE fn_items_notify_event();
@@ -170,30 +220,40 @@ CREATE OR REPLACE TRIGGER tg_items_update
 
 CREATE OR REPLACE FUNCTION fn_fields_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(fields_view) INTO view_data FROM fields_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(fields_view) INTO view_data FROM fields_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_fields_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_fields_insert_or_update
+    AFTER INSERT OR UPDATE 
+    ON fields
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_fields_notify_event();
+        
+        
+CREATE OR REPLACE TRIGGER tg_fields_delete
+    BEFORE DELETE
     ON fields
     FOR EACH ROW
         EXECUTE PROCEDURE fn_fields_notify_event();
@@ -202,35 +262,45 @@ CREATE OR REPLACE TRIGGER tg_fields_update
 -------------------------------------------------------------------------------
 
 
--- CREATE OR REPLACE FUNCTION fn_skus_notify_event() RETURNS trigger AS $$
---     DECLARE
---         payload JSON;
---     BEGIN
---         IF TG_OP = 'DELETE' THEN
---             payload = json_build_object(
---                 'table', TG_TABLE_NAME,
---                 'operation', TG_OP,
---                 'data', row_to_json(OLD)
---             );
---         ELSE
---             payload = json_build_object(
---                 'table', TG_TABLE_NAME,
---                 'operation', TG_OP,
---                 'data', row_to_json(NEW)
---             );
---         END IF;
---         PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+CREATE OR REPLACE FUNCTION fn_skus_notify_event() RETURNS trigger AS $$
+    DECLARE
+        view_data JSON;
+        payload JSON;
+    BEGIN
+        IF TG_OP = 'DELETE' THEN
+            SELECT row_to_json(skus_view) INTO view_data FROM skus_view WHERE id = OLD.id;
+        ELSE
+            SELECT row_to_json(skus_view) INTO view_data FROM skus_view WHERE id = NEW.id;
+        END IF;
 
---         RETURN NEW;
---     END
---     $$ LANGUAGE plpgsql;
+        payload = json_build_object(
+                'table', TG_TABLE_NAME,
+                'operation', TG_OP,
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
+
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
+    END
+    $$ LANGUAGE plpgsql;
 
 
--- CREATE OR REPLACE TRIGGER tg_skus_update
---     AFTER INSERT OR UPDATE OR DELETE
---     ON skus
---     FOR EACH ROW
---         EXECUTE PROCEDURE fn_skus_notify_event();
+CREATE OR REPLACE TRIGGER tg_skus_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON skus
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_skus_notify_event();
+
+
+CREATE OR REPLACE TRIGGER tg_skus_delete
+    BEFORE DELETE
+    ON skus
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_skus_notify_event();
 
 
 -------------------------------------------------------------------------------
@@ -238,30 +308,40 @@ CREATE OR REPLACE TRIGGER tg_fields_update
 
 CREATE OR REPLACE FUNCTION fn_stocks_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_stocks_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_stocks_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON stocks
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_stocks_notify_event();
+        
+        
+CREATE OR REPLACE TRIGGER tg_stocks_delete
+    BEFORE DELETE
     ON stocks
     FOR EACH ROW
         EXECUTE PROCEDURE fn_stocks_notify_event();
@@ -272,30 +352,40 @@ CREATE OR REPLACE TRIGGER tg_stocks_update
 
 CREATE OR REPLACE FUNCTION fn_docking_station_specifications_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_docking_station_specifications_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_docking_station_specifications_insert_or_update
+    AFTER INSERT OR UPDATE 
+    ON docking_station_specifications
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_docking_station_specifications_notify_event();
+        
+
+CREATE OR REPLACE TRIGGER tg_docking_station_specifications_delete
+    BEFORE DELETE
     ON docking_station_specifications
     FOR EACH ROW
         EXECUTE PROCEDURE fn_docking_station_specifications_notify_event();
@@ -304,32 +394,86 @@ CREATE OR REPLACE TRIGGER tg_docking_station_specifications_update
 -------------------------------------------------------------------------------
 
 
-CREATE OR REPLACE FUNCTION fn_laptop_specifications_notify_event() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION fn_graphics_card_specifications_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_laptop_specifications_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_graphics_card_specifications_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON graphics_card_specifications
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_graphics_card_specifications_notify_event();
+
+
+CREATE OR REPLACE TRIGGER tg_graphics_card_specifications_delete
+    BEFORE DELETE
+    ON graphics_card_specifications
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_graphics_card_specifications_notify_event();
+
+
+-------------------------------------------------------------------------------
+
+
+CREATE OR REPLACE FUNCTION fn_laptop_specifications_notify_event() RETURNS trigger AS $$
+    DECLARE
+        view_data JSON;
+        payload JSON;
+    BEGIN
+        IF TG_OP = 'DELETE' THEN
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+        ELSE
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
+                'table', TG_TABLE_NAME,
+                'operation', TG_OP,
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
+
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
+    END
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tg_laptop_specifications_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON laptop_specifications
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_laptop_specifications_notify_event();
+        
+
+CREATE OR REPLACE TRIGGER tg_laptop_specifications_delete
+    BEFORE DELETE
     ON laptop_specifications
     FOR EACH ROW
         EXECUTE PROCEDURE fn_laptop_specifications_notify_event();
@@ -340,30 +484,40 @@ CREATE OR REPLACE TRIGGER tg_laptop_specifications_update
 
 CREATE OR REPLACE FUNCTION fn_tft_specifications_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_tft_specifications_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_tft_specifications_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON tft_specifications
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_tft_specifications_notify_event();
+        
+
+CREATE OR REPLACE TRIGGER tg_tft_specifications_delete
+    BEFORE DELETE
     ON tft_specifications
     FOR EACH ROW
         EXECUTE PROCEDURE fn_tft_specifications_notify_event();
@@ -374,30 +528,40 @@ CREATE OR REPLACE TRIGGER tg_tft_specifications_update
 
 CREATE OR REPLACE FUNCTION fn_stock_location_history_notify_event() RETURNS trigger AS $$
     DECLARE
+        view_data JSON;
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            payload = json_build_object(
-                'table', TG_TABLE_NAME,
-                'operation', TG_OP,
-                'data', row_to_json(OLD)
-            );
+            SELECT row_to_json(stock_location_history_view) INTO view_data FROM stock_location_history_view WHERE id = OLD.id;
         ELSE
-            payload = json_build_object(
+            SELECT row_to_json(stock_location_history_view) INTO view_data FROM stock_location_history_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
-                'data', row_to_json(NEW)
-            );
-        END IF;
-        PERFORM pg_notify(CAST('table_update' AS TEXT), payload::TEXT);
+                'data', view_data);
+        
+        PERFORM pg_notify('table_update', payload::TEXT);
 
-        RETURN NEW;
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
     END
     $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER tg_stock_location_history_update
-    AFTER INSERT OR UPDATE OR DELETE
+CREATE OR REPLACE TRIGGER tg_stock_location_history_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON stock_location_history
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_stock_location_history_notify_event();
+        
+        
+CREATE OR REPLACE TRIGGER tg_stock_location_history_delete
+    BEFORE DELETE
     ON stock_location_history
     FOR EACH ROW
         EXECUTE PROCEDURE fn_stock_location_history_notify_event();
@@ -474,16 +638,23 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
     container_id VARCHAR(10)
 ) AS $$
     DECLARE
+        warehouse_location_fid INT;
         container_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
         row RECORD;
     BEGIN
+        SELECT 
+            id INTO warehouse_location_fid 
+        FROM 
+            warehouse_locations 
+        WHERE warehouse_location_id = 'PSEUDO';
+
         FOR row IN
             SELECT 
                 ('ST' || LPAD(nextval('sq_generate_container_ids')::VARCHAR(10), 7, '0'))::VARCHAR(10) AS container_id
             FROM
                 generate_series(1, $1)
         LOOP
-            INSERT INTO containers(container_id, warehouse_location_id, status) VALUES (row.container_id, 'PSEUDO', 'chosen');
+            INSERT INTO containers(container_id, warehouse_location_fid, status) VALUES (row.container_id, warehouse_location_fid, 'chosen');
             container_ids := container_ids || row.container_id;
         END LOOP;
 
@@ -523,12 +694,12 @@ CREATE OR REPLACE FUNCTION fn_item_stock_added() RETURNS TRIGGER AS $$
     DECLARE
         old_status VARCHAR(10);
     BEGIN
-        SELECT status INTO old_status FROM items WHERE item_id = NEW.item_id;
+        SELECT status INTO old_status FROM items WHERE id = NEW.item_fid;
 
         IF 
             old_status != 'added' 
         THEN
-            UPDATE items SET status = 'added' WHERE item_id = NEW.item_id;
+            UPDATE items SET status = 'added' WHERE id = NEW.item_fid;
         END IF;
 
         RETURN NEW;
@@ -551,12 +722,12 @@ CREATE OR REPLACE FUNCTION fn_container_stock_added() RETURNS TRIGGER AS $$
     DECLARE
         old_status VARCHAR(10);
     BEGIN
-        SELECT status INTO old_status FROM containers WHERE container_id = NEW.container_id;
+        SELECT status INTO old_status FROM containers WHERE id = NEW.container_fid;
 
         IF 
             old_status != 'added' 
         THEN
-            UPDATE containers SET status = 'added' WHERE container_id = NEW.container_id;
+            UPDATE containers SET status = 'added' WHERE id = NEW.container_fid;
         END IF;
 
         RETURN NEW;
@@ -579,12 +750,12 @@ CREATE OR REPLACE FUNCTION fn_warehouse_location_stock_added() RETURNS TRIGGER A
     DECLARE
         old_status VARCHAR(10);
     BEGIN
-        SELECT status INTO old_status FROM warehouse_locations WHERE warehouse_location_id = NEW.warehouse_location_id;
+        SELECT status INTO old_status FROM warehouse_locations WHERE id = NEW.warehouse_location_fid;
 
         IF 
             old_status != 'added' 
         THEN
-            UPDATE warehouse_locations SET status = 'added' WHERE warehouse_location_id = NEW.warehouse_location_id;
+            UPDATE warehouse_locations SET status = 'added' WHERE id = NEW.warehouse_location_fid;
         END IF;
 
         RETURN NEW;
@@ -612,12 +783,19 @@ CREATE OR REPLACE FUNCTION fn_item_location_updated() RETURNS TRIGGER AS $$
         THEN
             FOREACH element IN ARRAY NEW.items
             LOOP
-                UPDATE stocks SET container_id = NEW.container_id, warehouse_location_id = NEW.warehouse_location_id WHERE item_id = element;
+                UPDATE 
+                    stocks 
+                SET 
+                    container_fid = NEW.container_fid, warehouse_location_fid = NEW.warehouse_location_fid 
+                FROM 
+                    items 
+                WHERE 
+                    items.item_fid = stocks.item_fid AND items.item_id = element;
 
                 IF 
-                    (SELECT warehouse_location_id FROM containers WHERE container_id = NEW.container_id) <> NEW.warehouse_location_id
+                    (SELECT warehouse_location_fid FROM containers WHERE id = NEW.container_fid) <> NEW.warehouse_location_fid
                 THEN
-                    UPDATE containers SET warehouse_location_id = NEW.warehouse_location_id WHERE container_id = NEW.container_id;
+                    UPDATE containers SET warehouse_location_fid = NEW.warehouse_location_fid WHERE id = NEW.container_id;
                 END IF;
 
             END LOOP;
