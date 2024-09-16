@@ -4,11 +4,11 @@ import * as warehouseLocationController from "../controllers/warehouse_location_
 const warehouseLocationRouter = Router();
 
 warehouseLocationRouter
-  .route("/:warehouseLocationId")
-  .get(warehouseLocationController.getWarehouseLocation);
-warehouseLocationRouter
   .route("/")
   .get(warehouseLocationController.getAllWarehouseLocations);
+warehouseLocationRouter
+  .route("/:warehouseLocationId")
+  .get(warehouseLocationController.getWarehouseLocation);
 
 warehouseLocationRouter
   .route("/")

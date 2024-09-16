@@ -16,7 +16,8 @@ INSERT INTO users_new
     (email, username)
 SELECT 
     email, username 
-FROM users;
+FROM users 
+ORDER BY username;
 
 SELECT * FROM users_new;
 

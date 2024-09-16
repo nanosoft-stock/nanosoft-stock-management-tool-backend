@@ -7,8 +7,8 @@ userRouter.route("/:email").get(userController.getUserByEmail);
 
 userRouter.route("/").post(userController.addNewUser);
 
-userRouter.route("/:userUUID").patch(userController.updateUser);
+userRouter.route("/").patch(userController.updateUser);
 
-userRouter.route("/:userUUID").delete(userController.deleteUser);
+userRouter.route("/").delete(userController.deleteUser);
 
 export default userRouter;

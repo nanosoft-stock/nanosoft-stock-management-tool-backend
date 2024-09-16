@@ -1,14 +1,18 @@
+import { pool } from "../config/db.js";
 import * as userService from "../services/user_services.js";
 
 export const getUserByEmail = async (req, res) => {
   try {
     const email = req.params.email;
 
+    await pool.query("BEGIN");
     const result = await userService.getUserByEmail(email);
+    await pool.query("COMMIT");
 
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
   }
 };
 
@@ -16,35 +20,45 @@ export const addNewUser = async (req, res) => {
   try {
     const { data: user } = req.body;
 
+    await pool.query("BEGIN");
     await userService.addNewUser(user);
+    await pool.query("COMMIT");
 
     res.status(201).send();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
   }
 };
 
 export const updateUser = async (req, res) => {
   try {
-    const userUUID = req.params.userUUID;
-    const { data: user } = req.body;
+    const { data } = req.body;
+    const { id, ...user } = data;
 
-    await userService.updateUser(userUUID, user);
+    await pool.query("BEGIN");
+    await userService.updateUser(id, user);
+    await pool.query("COMMIT");
 
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
   }
 };
 
 export const deleteUser = async (req, res) => {
   try {
-    const userUUID = req.params.userUUID;
+    const { data } = req.body;
+    const { id } = data;
 
-    await userService.deleteUser(userUUID);
+    await pool.query("BEGIN");
+    await userService.deleteUser(id);
+    await pool.query("COMMIT");
 
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
   }
 };

@@ -1,40 +1,42 @@
-import { executeQuery } from "../config/db.js";
+import { pool } from "../config/db.js";
 
 export const getAllCategories = async () => {
-  const query = "SELECT * FROM categories ORDER BY category";
+  const query = "SELECT * FROM categories_view ORDER BY category";
   const values = [];
 
-  const result = await executeQuery(query, values);
+  const result = await pool.query(query, values);
 
-  return result;
+  return result.rows;
 };
 
 export const getCategory = async (category) => {
-  const query = "SELECT * FROM categories WHERE category = $1";
+  const query = "SELECT * FROM categories_view WHERE category = $1";
   const values = [category];
 
-  const result = await executeQuery(query, values);
+  const result = await pool.query(query, values);
 
-  return result;
+  return result.rows;
 };
 
 export const addNewCategory = async (category) => {
-  const query = "INSERT INTO categories (category) VALUES ($1)";
-  const values = [category];
+  const query = `INSERT INTO categories (category, created_by) 
+                 SELECT $1, users.id FROM users 
+                 WHERE email = $2`;
+  const values = [category.category, category.email];
 
-  await executeQuery(query, values);
+  await pool.query(query, values);
 };
 
-export const updateCategory = async (oldCategory, newCategory) => {
-  const query = "UPDATE categories SET category = $1 WHERE category = $2";
-  const values = [newCategory, oldCategory];
+export const updateCategory = async (id, category) => {
+  const query = "UPDATE categories SET category = $1 WHERE id = $2";
+  const values = [category, id];
 
-  await executeQuery(query, values);
+  await pool.query(query, values);
 };
 
-export const deleteCategory = async (category) => {
-  const query = "DELETE FROM categories WHERE category = $1";
-  const values = [category];
+export const deleteCategory = async (id) => {
+  const query = "DELETE FROM categories WHERE id = $1";
+  const values = [id];
 
-  await executeQuery(query, values);
+  await pool.query(query, values);
 };

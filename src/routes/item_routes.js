@@ -3,8 +3,8 @@ import * as itemController from "../controllers/item_controller.js";
 
 const itemRouter = Router();
 
-itemRouter.route("/:itemId").get(itemController.getItem);
 itemRouter.route("/").get(itemController.getAllItems);
+itemRouter.route("/:itemId").get(itemController.getItem);
 
 itemRouter.route("/").post(itemController.addItem);
 itemRouter.route("/batch").post(itemController.addItems);

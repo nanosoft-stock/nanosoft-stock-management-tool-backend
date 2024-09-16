@@ -1,51 +1,45 @@
-import { executeQuery } from "../config/db.js";
+import { pool } from "../config/db.js";
 
 export const getUserByEmail = async (email) => {
-  const query = "SELECT * FROM users WHERE email = $1";
+  const query = "SELECT * FROM users_view WHERE email = $1";
   const values = [email];
 
-  const result = await executeQuery(query, values);
+  const result = await pool.query(query, values);
 
-  return result;
+  return result.rows;
 };
 
 export const addNewUser = async (user) => {
-  const keys = Object.keys(user);
-  const vals = Object.values(user);
+  const query = "INSERT INTO users (email, username) VALUES ($1, $2)";
+  const values = [user.email, user.username];
 
-  let query = "INSERT INTO users ";
-  const values = [];
-  let index = 1;
-
-  query += "(" + keys.join(", ") + ")";
-  query += " VALUES ";
-
-  query += "(" + keys.map((_) => `$${index++}`).join(", ") + ")";
-  values.push(...vals);
-
-  await executeQuery(query, values);
+  await pool.query(query, values);
 };
 
-export const updateUser = async (userUUID, user) => {
-  const keys = Object.keys(user);
-  const vals = Object.values(user);
+export const updateUser = async (id, user) => {
+  const entries = Object.entries(user);
 
+  let index = 1;
   let query = "UPDATE users SET ";
   const values = [];
 
-  let index = 1;
-  query += keys.map((key) => `${key} = $${index++}`).join(", ");
-  values.push(...vals);
+  query += entries
+    .map(([key, value]) => {
+      values.push(value);
 
-  query += ` WHERE user_uuid = $${index++}`;
-  values.push(userUUID);
+      return `${key} = $${index++}`;
+    })
+    .join(", ");
 
-  await executeQuery(query, values);
+  query += ` WHERE id = $${index}`;
+  values.push(id);
+
+  await pool.query(query, values);
 };
 
-export const deleteUser = async (userUUID) => {
-  const query = "DELETE FROM users WHERE user_uuid = $1";
-  const values = [userUUID];
+export const deleteUser = async (id) => {
+  const query = "DELETE FROM users WHERE id = $1";
+  const values = [id];
 
-  await executeQuery(query, values);
+  await pool.query(query, values);
 };

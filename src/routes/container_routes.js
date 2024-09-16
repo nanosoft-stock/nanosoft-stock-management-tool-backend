@@ -3,8 +3,8 @@ import * as containerController from "../controllers/container_controller.js";
 
 const containerRouter = Router();
 
-containerRouter.route("/:containerId").get(containerController.getContainer);
 containerRouter.route("/").get(containerController.getAllContainers);
+containerRouter.route("/:containerId").get(containerController.getContainer);
 
 containerRouter.route("/").post(containerController.addContainer);
 containerRouter.route("/batch").post(containerController.addContainers);
