@@ -49,7 +49,9 @@ export const addItems = async (req, res) => {
     const { data: items } = req.body;
 
     await pool.query("BEGIN");
-    await itemService.addItems(items);
+    for (let i = 0; i < items.length; i++) {
+      await itemService.addItem(items[i]);
+    }
     await pool.query("COMMIT");
 
     res.status(201).send();
@@ -79,7 +81,9 @@ export const updateItems = async (req, res) => {
     const { data: items } = req.body;
 
     await pool.query("BEGIN");
-    await Promise.all(items.map((item) => itemService.updateItem(item)));
+    for (let i = 0; i < items.length; i++) {
+      await itemService.updateItem(items[i]);
+    }
     await pool.query("COMMIT");
 
     res.status(204).send();
@@ -121,10 +125,10 @@ export const deleteItems = async (req, res) => {
 
 export const generateNewItems = async (req, res) => {
   try {
-    const { count } = req.body.data;
+    const { count, email } = req.body.data;
 
     await pool.query("BEGIN");
-    const result = await itemService.generateNewItems(count);
+    const result = await itemService.generateNewItems(count, email);
     await pool.query("COMMIT");
 
     res.status(201).json(result);

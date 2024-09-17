@@ -33,11 +33,10 @@ export const addNewUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { data } = req.body;
-    const { id, ...user } = data;
+    const { data: user } = req.body;
 
     await pool.query("BEGIN");
-    await userService.updateUser(id, user);
+    await userService.updateUser(user);
     await pool.query("COMMIT");
 
     res.status(204).send();
@@ -49,11 +48,10 @@ export const updateUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const { data } = req.body;
-    const { id } = data;
+    const { data: user } = req.body;
 
     await pool.query("BEGIN");
-    await userService.deleteUser(id);
+    await userService.deleteUser(user);
     await pool.query("COMMIT");
 
     res.status(204).send();

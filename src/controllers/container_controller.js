@@ -64,8 +64,7 @@ export const addContainers = async (req, res) => {
 
 export const updateContainer = async (req, res) => {
   try {
-    const { data } = req.body;
-    const { id, ...container } = data;
+    const { data: container } = req.body;
 
     await pool.query("BEGIN");
     await containerService.updateContainer(container);
@@ -84,8 +83,7 @@ export const updateContainers = async (req, res) => {
 
     await pool.query("BEGIN");
     for (let i = 0; i < containers.length; i++) {
-      const { id, ...container } = containers[i];
-      await containerService.updateContainer(id, container);
+      await containerService.updateContainer(containers[i]);
     }
     await pool.query("COMMIT");
 
@@ -128,10 +126,10 @@ export const deleteContainers = async (req, res) => {
 
 export const generateNewContainers = async (req, res) => {
   try {
-    const { count } = req.body.data;
+    const { count, email } = req.body.data;
 
     await pool.query("BEGIN");
-    const result = await containerService.generateNewContainers(count);
+    const result = await containerService.generateNewContainers(count, email);
     await pool.query("COMMIT");
 
     res.status(201).json(result);

@@ -46,11 +46,10 @@ export const addNewCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
-    const { data } = req.body;
-    const { id, ...category } = data;
+    const { data: category } = req.body;
 
     await pool.query("BEGIN");
-    await categoryService.updateCategory(id, category);
+    await categoryService.updateCategory(category);
     await pool.query("COMMIT");
 
     res.status(204).send();
@@ -62,11 +61,10 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
-    const { data } = req.body;
-    const { id } = data;
+    const { data: category } = req.body;
 
     await pool.query("BEGIN");
-    await categoryService.deleteCategory(id);
+    await categoryService.deleteCategory(category);
     await pool.query("COMMIT");
 
     res.status(204).send();

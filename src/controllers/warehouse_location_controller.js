@@ -52,8 +52,9 @@ export const addWarehouseLocations = async (req, res) => {
 
     await pool.query("BEGIN");
     for (let i = 0; i < warehouseLocations.length; i++) {
-      const warehouseLocation = warehouseLocations[i];
-      await warehouseLocationService.addWarehouseLocation(warehouseLocation);
+      await warehouseLocationService.addWarehouseLocation(
+        warehouseLocations[i]
+      );
     }
     await pool.query("COMMIT");
 
@@ -66,14 +67,10 @@ export const addWarehouseLocations = async (req, res) => {
 
 export const updateWarehouseLocation = async (req, res) => {
   try {
-    const { data } = req.body;
-    const { id, ...warehouseLocation } = data;
+    const { data: warehouseLocation } = req.body;
 
     await pool.query("BEGIN");
-    await warehouseLocationService.updateWarehouseLocation(
-      id,
-      warehouseLocation
-    );
+    await warehouseLocationService.updateWarehouseLocation(warehouseLocation);
     await pool.query("COMMIT");
 
     res.status(204).send();
@@ -89,11 +86,8 @@ export const updateWarehouseLocations = async (req, res) => {
 
     await pool.query("BEGIN");
     for (let i = 0; i < warehouseLocations.length; i++) {
-      const { id, ...warehouseLocation } = warehouseLocations[i];
-
       await warehouseLocationService.updateWarehouseLocation(
-        id,
-        warehouseLocation
+        warehouseLocations[i]
       );
     }
     await pool.query("COMMIT");

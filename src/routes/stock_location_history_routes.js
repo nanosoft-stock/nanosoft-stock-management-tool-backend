@@ -4,11 +4,11 @@ import * as slhController from "../controllers/stock_location_history_controller
 const stockLocationHistoryRouter = Router();
 
 stockLocationHistoryRouter
-  .route("/:slhUuid")
-  .get(slhController.getStockLocationHistory);
-stockLocationHistoryRouter
   .route("/")
   .get(slhController.getAllStockLocationHistory);
+stockLocationHistoryRouter
+  .route("/:id")
+  .get(slhController.getStockLocationHistory);
 
 stockLocationHistoryRouter
   .route("/")

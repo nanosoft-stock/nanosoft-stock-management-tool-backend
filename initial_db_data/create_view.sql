@@ -124,7 +124,7 @@ AS
         containers.container_id AS container_id,
         warehouse_locations.warehouse_location_id AS warehouse_location_id,
         move_type,
-        stock_location_history.status,
+        stock_location_history.status AS status,
         users.username AS username
     FROM stock_location_history
         LEFT JOIN containers ON containers.id = stock_location_history.container_fid

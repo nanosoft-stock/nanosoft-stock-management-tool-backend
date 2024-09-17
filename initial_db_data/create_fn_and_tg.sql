@@ -578,25 +578,37 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_item_ids
     MAXVALUE 99999999;
 
 
-CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT) RETURNS TABLE (
-    item_id VARCHAR(10)
+CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT, VARCHAR) RETURNS TABLE (
+    id INT,
+    item_id VARCHAR(10),
+    status VARCHAR(10)
 ) AS $$
     DECLARE
         item_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
+        user_fid INT;
         row RECORD;
     BEGIN
+        SELECT 
+            users_view.id INTO user_fid
+        FROM 
+            users_view
+        WHERE users_view.email = $2;
+        
         FOR row IN 
             SELECT 
                 nextval('sq_generate_item_ids')::VARCHAR(10) AS item_id 
             FROM 
                 generate_series(1, $1)
         LOOP
-            INSERT INTO items (item_id, status) VALUES (row.item_id, 'chosen');
+            INSERT INTO items (item_id, status, created_by) 
+            VALUES (row.item_id, 'chosen', user_fid);
+            
             item_ids := item_ids || row.item_id;
         END LOOP;
 
         RETURN QUERY 
-            SELECT unnest(item_ids) AS item_id;
+            SELECT * FROM items_view
+            WHERE items_view.item_id = ANY(item_ids);
     END
     $$ LANGUAGE plpgsql;
 
@@ -634,19 +646,29 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_container_ids
     MAXVALUE 9999999;
 
 
-CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
-    container_id VARCHAR(10)
+CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT, VARCHAR) RETURNS TABLE (
+    id INT,
+    container_id VARCHAR(10),
+    warehouse_location_id VARCHAR(20),
+    status VARCHAR(10)
 ) AS $$
     DECLARE
         warehouse_location_fid INT;
+        user_fid INT;
         container_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
         row RECORD;
     BEGIN
         SELECT 
-            id INTO warehouse_location_fid 
+            warehouse_locations_view.id INTO warehouse_location_fid 
         FROM 
-            warehouse_locations 
-        WHERE warehouse_location_id = 'PSEUDO';
+            warehouse_locations_view 
+        WHERE warehouse_locations_view.warehouse_location_id = 'PSEUDO';
+
+        SELECT 
+            users_view.id INTO user_fid
+        FROM 
+            users_view 
+        WHERE users_view.email = $2;
 
         FOR row IN
             SELECT 
@@ -654,12 +676,15 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT) RETURNS TABLE (
             FROM
                 generate_series(1, $1)
         LOOP
-            INSERT INTO containers(container_id, warehouse_location_fid, status) VALUES (row.container_id, warehouse_location_fid, 'chosen');
+            INSERT INTO containers (container_id, warehouse_location_fid, status, created_by) 
+            VALUES (row.container_id, warehouse_location_fid, 'chosen', user_fid);
+
             container_ids := container_ids || row.container_id;
         END LOOP;
 
         RETURN QUERY
-            SELECT unnest(container_ids) as container_id;
+            SELECT * FROM containers_view 
+            WHERE containers_view.container_id = ANY(container_ids);
     END
     $$ LANGUAGE plpgsql;
 
