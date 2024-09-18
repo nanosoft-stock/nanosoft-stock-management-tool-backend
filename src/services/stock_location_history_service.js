@@ -77,7 +77,7 @@ export const deleteStockLocationHistories = async (histories) => {
 };
 
 export const queryStockLocationHistory = async (q) => {
-  q[`from`] = `stock_location_history`;
+  q["from"] = "stock_location_history";
 
   const { query, values } = queryBuilderHelper(q);
 

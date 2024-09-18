@@ -3,8 +3,8 @@ import * as stockController from "../controllers/stock_controller.js";
 
 const stockRouter = Router();
 
-stockRouter.route("/:itemId").get(stockController.getStock);
 stockRouter.route("/").get(stockController.getAllStocks);
+stockRouter.route("/:itemId").get(stockController.getStock);
 
 stockRouter.route("/").post(stockController.addStock);
 stockRouter.route("/batch").post(stockController.addStocks);
