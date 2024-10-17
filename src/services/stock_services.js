@@ -84,123 +84,54 @@ export const addStock = async (stock) => {
 };
 
 export const updateStock = async (stock) => {
-  `UPDATE stocks SET
-   date = COALESCE($1, date), 
-   item_fid = COALESCE((SELECT id FROM items WHERE item_id = $2), item_fid), 
-   category_fid = COALESCE((SELECT id FROM categories WHERE container_id = $2), container_fid), 
-   container_fid = COALESCE((SELECT id FROM containers WHERE container_id = $2), container_fid), 
-   warehouse_location_fid = COALESCE((SELECT id FROM warehouse_locations WHERE warehouse_location_id = $2), warehouse_location_fid), 
-   warehouse_location_fid = COALESCE((SELECT id FROM warehouse_locations WHERE warehouse_location_id = $2), warehouse_location_fid), 
-   `
+  const stockQuery = `UPDATE stocks SET
+   item_fid = COALESCE((SELECT id FROM items WHERE item_id = $1), item_fid), 
+   category_fid = COALESCE((SELECT id FROM categories WHERE category_id = $2), category_fid), 
+   skus_fid = COALESCE((SELECT id FROM skus WHERE sku_id = $3), sku_fid), 
+   serial_number = COALESCE($4, serial_number), 
+   container_fid = COALESCE((SELECT id FROM containers WHERE container_id = $5), container_fid), 
+   warehouse_location_fid = COALESCE((SELECT id FROM warehouse_locations WHERE warehouse_location_id = $6), warehouse_location_fid), 
+   supplier_info = COALESCE($7, supplier_info), 
+   comments = COALESCE($8, supplier_info), 
+   WHERE id = $9
+   `;
+  const stockValues = [
+    stock.item_id,
+    stock.category,
+    stock.sku,
+    stock.serial_number,
+    stock.container_id,
+    stock.warehouse_location_id,
+    stock.supplier_info,
+    stock.comments,
+    stock.id,
+  ];
+
+  const keys = Object.keys(stock);
+  const categoryBasedColumns = {};
+
+  for (let key of keys) {
+    if (!commonColumns.includes(key)) {
+      categoryBasedColumns[key] = stock[key];
+    }
+  }
+
+  const categoryKeys = Object.keys(categoryBasedColumns);
+
+  let index = 1;
+  const categoryKey = stock.category.replace(" ", "_").toLowerCase();
+  const categoryBasedQuery = `UPDATE ${categoryKey}_specifications 
+   ${categoryKeys.map((key) => `${key} = COALESCE(${index++}, ${key})`).join(", ")}
+   WHERE item_fid = (SELECT id FROM items WHERE item_id = ${index++})
+   `;
+  const categoryBasedValues = [
+    ...categoryKeys.map((key) => stock[key]),
+    stock.item_id,
+  ];
+
+  await pool.query(stockQuery, stockValues);
+  await pool.query(categoryBasedQuery, categoryBasedValues);
 };
-
-// export const addStock = async (stock) => {
-//   const keys = Object.keys(stock);
-
-//   const stockColumns = {};
-//   const categoryBasedColumns = {};
-
-//   for (let key of keys) {
-//     if (key == `item_id`) {
-//       categoryBasedColumns[key] = stock[key];
-//     }
-
-//     if (commonColumns.includes(key)) {
-//       stockColumns[key] = stock[key];
-//     } else {
-//       categoryBasedColumns[key] = stock[key];
-//     }
-//   }
-
-//   let stockQuery = `INSERT INTO stocks `;
-//   const stockValues = [];
-//   let index = 1;
-
-//   stockQuery += `(` + Object.keys(stockColumns).join(`, `) + `)`;
-//   stockQuery += ` VALUES `;
-
-//   stockQuery +=
-//     `(` +
-//     Object.keys(stockColumns)
-//       .map((_) => `$${index++}`)
-//       .join(`, `) +
-//     `)`;
-
-//   stockValues.push(...Object.values(stockColumns));
-
-//   const categoryKey = stock.category.replace(` `, `_`).toLowerCase();
-//   let categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications `;
-//   const categoryBasedValues = [];
-//   index = 1;
-
-//   categoryBasedQuery +=
-//     `(` + Object.keys(categoryBasedColumns).join(`, `) + `)`;
-//   categoryBasedQuery += ` VALUES `;
-
-//   categoryBasedQuery +=
-//     `(` +
-//     Object.keys(categoryBasedColumns)
-//       .map((_) => `$${index++}`)
-//       .join(`, `) +
-//     `)`;
-
-//   categoryBasedValues.push(...Object.values(categoryBasedColumns));
-
-//   await Promise.all([
-//     pool.query(stockQuery, stockValues),
-//     pool.query(categoryBasedQuery, categoryBasedValues),
-//   ]);
-// };
-
-// export const updateStock = async (stock) => {
-//   const keys = Object.keys(stock);
-
-//   const stockColumns = {};
-//   const categoryBasedColumns = {};
-//   const item_id = stock.item_id;
-
-//   for (let key of keys) {
-//     if (key == `item_id`) {
-//       continue;
-//     }
-
-//     if (commonColumns.includes(key)) {
-//       stockColumns[key] = stock[key];
-//     } else {
-//       categoryBasedColumns[key] = stock[key];
-//     }
-//   }
-
-//   let stockQuery = `UPDATE stocks SET `;
-//   const stockValues = [];
-//   let index = 1;
-
-//   stockQuery += Object.keys(stockColumns)
-//     .map((key) => `${key} = $${index++}`)
-//     .join(`, `);
-//   stockValues.push(...Object.values(stockColumns));
-
-//   stockQuery += ` WHERE item_id = $${index++}`;
-//   stockValues.push(item_id);
-
-//   const categoryKey = stock.category.replace(` `, `_`).toLowerCase();
-//   let categoryBasedQuery = `UPDATE ${categoryKey}_specifications SET `;
-//   const categoryBasedValues = [];
-//   index = 1;
-
-//   categoryBasedQuery += Object.keys(categoryBasedColumns)
-//     .map((key) => `${key} = $${index++}`)
-//     .join(`, `);
-//   categoryBasedValues.push(...Object.values(categoryBasedColumns));
-
-//   categoryBasedQuery += ` WHERE item_id = $${index++}`;
-//   categoryBasedValues.push(item_id);
-
-//   await Promise.all([
-//     pool.query(stockQuery, stockValues),
-//     pool.query(categoryBasedQuery, categoryBasedValues),
-//   ]);
-// };
 
 export const deleteStock = async (stock) => {
   const stocksQuery = `DELETE FROM stocks 

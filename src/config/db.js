@@ -6,7 +6,7 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const pool = new Pool({
+export const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
@@ -37,8 +37,11 @@ pool.connect(async (error, client, done) => {
 export const executeQuery = async (query, values) => {
   try {
     pool.query("BEGIN");
+
     const result = await pool.query(query, values);
+
     pool.query("COMMIT");
+    
     return result.rows;
   } catch (error) {
     pool.query("ROLLBACK");
