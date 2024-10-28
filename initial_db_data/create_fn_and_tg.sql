@@ -578,22 +578,15 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_item_ids
     MAXVALUE 99999999;
 
 
-CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT, VARCHAR) RETURNS TABLE (
+CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT, INT) RETURNS TABLE (
     id INT,
     item_id VARCHAR(10),
     status VARCHAR(10)
 ) AS $$
     DECLARE
         item_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
-        user_fid INT;
         row RECORD;
     BEGIN
-        SELECT 
-            users_view.id INTO user_fid
-        FROM 
-            users_view
-        WHERE users_view.email = $2;
-        
         FOR row IN 
             SELECT 
                 nextval('sq_generate_item_ids')::VARCHAR(10) AS item_id 
@@ -601,8 +594,8 @@ CREATE OR REPLACE FUNCTION fn_generate_item_ids(INT, VARCHAR) RETURNS TABLE (
                 generate_series(1, $1)
         LOOP
             INSERT INTO items (item_id, status, created_by) 
-            VALUES (row.item_id, 'chosen', user_fid);
-            
+            VALUES (row.item_id, 'chosen', $2);
+
             item_ids := item_ids || row.item_id;
         END LOOP;
 
@@ -646,7 +639,7 @@ CREATE SEQUENCE IF NOT EXISTS sq_generate_container_ids
     MAXVALUE 9999999;
 
 
-CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT, VARCHAR) RETURNS TABLE (
+CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT, INT) RETURNS TABLE (
     id INT,
     container_id VARCHAR(10),
     warehouse_location_id VARCHAR(20),
@@ -654,7 +647,6 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT, VARCHAR) RETURNS TABLE
 ) AS $$
     DECLARE
         warehouse_location_fid INT;
-        user_fid INT;
         container_ids VARCHAR(10)[] := ARRAY[]::VARCHAR(10)[];
         row RECORD;
     BEGIN
@@ -664,12 +656,6 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT, VARCHAR) RETURNS TABLE
             warehouse_locations_view 
         WHERE warehouse_locations_view.warehouse_location_id = 'PSEUDO';
 
-        SELECT 
-            users_view.id INTO user_fid
-        FROM 
-            users_view 
-        WHERE users_view.email = $2;
-
         FOR row IN
             SELECT 
                 ('ST' || LPAD(nextval('sq_generate_container_ids')::VARCHAR(10), 7, '0'))::VARCHAR(10) AS container_id
@@ -677,7 +663,7 @@ CREATE OR REPLACE FUNCTION fn_generate_container_ids(INT, VARCHAR) RETURNS TABLE
                 generate_series(1, $1)
         LOOP
             INSERT INTO containers (container_id, warehouse_location_fid, status, created_by) 
-            VALUES (row.container_id, warehouse_location_fid, 'chosen', user_fid);
+            VALUES (row.container_id, warehouse_location_fid, 'chosen', $2);
 
             container_ids := container_ids || row.container_id;
         END LOOP;

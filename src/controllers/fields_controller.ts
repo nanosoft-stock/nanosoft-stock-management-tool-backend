@@ -36,6 +36,21 @@ export const getCategoryFields = async (
   }
 };
 
+export const addField = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { data: field } = req.body;
+
+    await pool.query("BEGIN");
+    await fieldsService.addField(field);
+    await pool.query("COMMIT");
+
+    res.status(201).send();
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
+  }
+};
+
 export const addFields = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: fields } = req.body;
@@ -53,6 +68,24 @@ export const addFields = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const updateField = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { data: field } = req.body;
+
+    await pool.query("BEGIN");
+    await fieldsService.updateField(field);
+    await pool.query("COMMIT");
+
+    res.status(204).send();
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
+  }
+};
+
 export const updateFields = async (
   req: Request,
   res: Response,
@@ -64,6 +97,24 @@ export const updateFields = async (
     for (let i = 0; i < fields.length; i++) {
       await fieldsService.updateField(fields[i]);
     }
+    await pool.query("COMMIT");
+
+    res.status(204).send();
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    res.status(500).json({ error });
+  }
+};
+
+export const deleteField = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { data: field } = req.body;
+
+    await pool.query("BEGIN");
+    await fieldsService.deleteField(field);
     await pool.query("COMMIT");
 
     res.status(204).send();

@@ -162,7 +162,7 @@ export const generateNewContainers = async (
     );
     await pool.query("COMMIT");
 
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });

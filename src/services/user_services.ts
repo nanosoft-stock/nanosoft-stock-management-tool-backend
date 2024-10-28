@@ -11,7 +11,8 @@ export const getUserByEmail = async (email: string): Promise<any[]> => {
 };
 
 export const addNewUser = async (user): Promise<void> => {
-  const query = `INSERT INTO users (email, username) VALUES ($1, $2)`;
+  const query = `INSERT INTO users (email, username) 
+                 VALUES ($1, $2)`;
   const values = [user.email, user.username];
 
   await pool.query(query, values);

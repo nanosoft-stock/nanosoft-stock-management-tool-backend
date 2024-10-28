@@ -36,26 +36,24 @@ export const getStock = async (itemId: string): Promise<any[]> => {
 
 export const addStock = async (stock): Promise<void> => {
   const stockQuery = `INSERT INTO stocks 
-                      (date, item_fid, category_fid, sku_fid, serial_number, container_fid, warehouse_location_fid, supplier_info, comments, user_fid) 
-                      SELECT $1, items.id, categories.id, skus.id, $2, containers.id, warehouse_locations.id, $3, $4, users.id 
-                      FROM users
-                      LEFT JOIN items ON items.item_id = $5  
-                      LEFT JOIN categories ON categories.category = $6 
-                      LEFT JOIN skus ON skus.sku = $7 
-                      LEFT JOIN containers ON containers.container_id = $8 
-                      LEFT JOIN warehouse_locations ON warehouse_locations.warehouse_location_id = $9 
-                      WHERE users.email = $10`;
+                      (item_fid, category_fid, sku_fid, serial_number, container_fid, warehouse_location_fid, supplier_info, comments, user_fid) 
+                      SELECT items.id, categories.id, skus.id, $1, containers.id, warehouse_locations.id, $2, $3, $4 
+                      FROM items
+                      LEFT JOIN categories ON categories.category = $5 
+                      LEFT JOIN skus ON skus.sku = $6 
+                      LEFT JOIN containers ON containers.container_id = $7 
+                      LEFT JOIN warehouse_locations ON warehouse_locations.warehouse_location_id = $8 
+                      WHERE items.item_id = $9`;
   const stockValues = [
-    stock.date,
     stock.serial_number,
     stock.supplier_info,
     stock.comments,
-    stock.item_id,
+    stock.user_id,
     stock.category,
     stock.sku,
     stock.container_id,
     stock.warehouse_location_id,
-    stock.email,
+    stock.item_id,
   ];
 
   const keys = Object.keys(stock);
@@ -72,9 +70,9 @@ export const addStock = async (stock): Promise<void> => {
   let index = 1;
   const categoryKey = stock.category.replace(` `, `_`).toLowerCase();
   const categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications 
-        (item_fid, ${categoryKeys.join(", ")}) 
-        SELECT items.id, ${categoryKeys.map(() => `$${index++}`).join(", ")} 
-        FROM items WHERE items.item_id = $${index++}`;
+                              (item_fid, ${categoryKeys.join(", ")}) 
+                              SELECT items.id, ${categoryKeys.map(() => `$${index++}`).join(", ")} 
+                              FROM items WHERE items.item_id = $${index++}`;
   const categoryBasedValues = [
     ...Object.values(categoryBasedColumns),
     stock.item_id,
@@ -86,18 +84,17 @@ export const addStock = async (stock): Promise<void> => {
 
 export const updateStock = async (stock): Promise<void> => {
   const stockQuery = `UPDATE stocks SET
-   item_fid = COALESCE((SELECT id FROM items WHERE item_id = $1), item_fid), 
-   category_fid = COALESCE((SELECT id FROM categories WHERE category_id = $2), category_fid), 
-   skus_fid = COALESCE((SELECT id FROM skus WHERE sku_id = $3), sku_fid), 
-   serial_number = COALESCE($4, serial_number), 
-   container_fid = COALESCE((SELECT id FROM containers WHERE container_id = $5), container_fid), 
-   warehouse_location_fid = COALESCE((SELECT id FROM warehouse_locations WHERE warehouse_location_id = $6), warehouse_location_fid), 
-   supplier_info = COALESCE($7, supplier_info), 
-   comments = COALESCE($8, supplier_info), 
-   WHERE id = $9
-   `;
+                      category_fid = COALESCE((SELECT id FROM categories WHERE category_id = $1), category_fid), 
+                      skus_fid = COALESCE((SELECT id FROM skus WHERE sku_id = $2), sku_fid), 
+                      serial_number = COALESCE($3, serial_number), 
+                      container_fid = COALESCE((SELECT id FROM containers WHERE container_id = $4), container_fid), 
+                      warehouse_location_fid = COALESCE((SELECT id FROM warehouse_locations WHERE warehouse_location_id = $5), warehouse_location_fid), 
+                      supplier_info = COALESCE($6, supplier_info), 
+                      comments = COALESCE($7, comments) 
+                      FROM items 
+                      where items.item_id = $8`;
+
   const stockValues = [
-    stock.item_id,
     stock.category,
     stock.sku,
     stock.serial_number,
@@ -105,7 +102,7 @@ export const updateStock = async (stock): Promise<void> => {
     stock.warehouse_location_id,
     stock.supplier_info,
     stock.comments,
-    stock.id,
+    stock.item_id,
   ];
 
   const keys = Object.keys(stock);
@@ -122,9 +119,8 @@ export const updateStock = async (stock): Promise<void> => {
   let index = 1;
   const categoryKey = stock.category.replace(" ", "_").toLowerCase();
   const categoryBasedQuery = `UPDATE ${categoryKey}_specifications 
-   ${categoryKeys.map((key) => `${key} = COALESCE(${index++}, ${key})`).join(", ")}
-   WHERE item_fid = (SELECT id FROM items WHERE item_id = ${index++})
-   `;
+                              ${categoryKeys.map((key) => `${key} = COALESCE(${index++}, ${key})`).join(", ")}
+                              WHERE item_fid = (SELECT id FROM items WHERE item_id = ${index++})`;
   const categoryBasedValues = [
     ...categoryKeys.map((key) => stock[key]),
     stock.item_id,
@@ -151,7 +147,7 @@ export const deleteStock = async (stock): Promise<void> => {
 };
 
 export const queryStocks = async (q): Promise<any[]> => {
-  q[`from`] = `stocks`;
+  q["from"] = "stocks";
 
   const { query, values } = queryBuilderHelper(q);
 

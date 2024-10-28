@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS stock_modifications_history (
 
 CREATE TABLE IF NOT EXISTS docking_station_specifications (
     id SERIAL,
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     make VARCHAR(255),
     model VARCHAR(255),
     condition VARCHAR(255),
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS docking_station_specifications (
 CREATE TABLE IF NOT EXISTS docking_station_modifications_history (
     id BIGSERIAL,
     date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(), -- modified_on
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     make VARCHAR(255),
     model VARCHAR(255),
     condition VARCHAR(255),
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS docking_station_modifications_history (
 
 CREATE TABLE IF NOT EXISTS graphics_card_specifications (
     id SERIAL,
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     make VARCHAR(255),
     model VARCHAR(255),
     condition VARCHAR(255),
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS graphics_card_specifications (
 CREATE TABLE IF NOT EXISTS graphics_card_modifications_history (
     id SERIAL,
     date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(), -- modified_on
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     make VARCHAR(255),
     model VARCHAR(255),
     condition VARCHAR(255),
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS graphics_card_modifications_history (
 
 CREATE TABLE IF NOT EXISTS laptop_specifications (
     id SERIAL,
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     aiken_id VARCHAR(255),
     supplier_id VARCHAR(255),
     make VARCHAR(255),
@@ -282,7 +282,7 @@ CREATE TABLE IF NOT EXISTS laptop_specifications (
 CREATE TABLE IF NOT EXISTS laptop_modifications_history (
     id SERIAL,
     date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(), -- modified_on
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     aiken_id VARCHAR(255),
     supplier_id VARCHAR(255),
     make VARCHAR(255),
@@ -336,7 +336,7 @@ CREATE TABLE IF NOT EXISTS laptop_modifications_history (
 
 CREATE TABLE IF NOT EXISTS tft_specifications (
     id SERIAL,
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     make VARCHAR(255),
     model VARCHAR(255),
     screen_size VARCHAR(255),
@@ -356,7 +356,7 @@ CREATE TABLE IF NOT EXISTS tft_specifications (
 CREATE TABLE IF NOT EXISTS tft_modifications_history (
     id SERIAL,
     date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(), -- modified_on
-    item_fid INT NOT NULL,
+    item_fid INT NOT NULL, -- This should be stock_id
     make VARCHAR(255),
     model VARCHAR(255),
     screen_size VARCHAR(255),
@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS stock_location_history(
     id BIGSERIAL,
     date TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     group_uuid UUID,
-    items VARCHAR(10)[] NOT NULL, -- And Is it right to store item_id's in a ARRAY when a container moves
+    items VARCHAR(10)[] NOT NULL, -- And Is it right to store item_id's in a ARRAY when a container moves -- and maybe it should be stock_id
     container_fid INT NOT NULL,
     warehouse_location_fid INT NOT NULL,
     move_type VARCHAR(20) NOT NULL,

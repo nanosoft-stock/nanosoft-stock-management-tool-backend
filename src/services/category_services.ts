@@ -21,9 +21,8 @@ export const getCategory = async (category: string): Promise<any[]> => {
 
 export const addNewCategory = async (category): Promise<void> => {
   const query = `INSERT INTO categories (category, created_by) 
-                 SELECT $1, users_view.id FROM users_view 
-                 WHERE email = $2`;
-  const values = [category.category, category.email];
+                 VALUES ($1, $2)`;
+  const values = [category.category, category.user_id];
 
   await pool.query(query, values);
 };

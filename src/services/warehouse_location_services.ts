@@ -25,11 +25,11 @@ export const addWarehouseLocation = async (
   warehouseLocation,
 ): Promise<void> => {
   const query = `INSERT INTO warehouse_locations (warehouse_location_id, status, created_by) 
-                 SELECT $1, $2, users_view.id FROM users_view WHERE email = $3`;
+                 VALUES ($1, $2, $3)`;
   const values = [
     warehouseLocation.warehouse_location_id,
     warehouseLocation.status,
-    warehouseLocation.email,
+    warehouseLocation.user_id,
   ];
 
   await pool.query(query, values);

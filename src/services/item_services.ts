@@ -21,8 +21,8 @@ export const getItem = async (itemId: string): Promise<any[]> => {
 
 export const addItem = async (item): Promise<void> => {
   const query = `INSERT INTO items (item_id, status, created_by) 
-                 SELECT $1, $2, users_view.id FROM users_view WHERE email = $3`;
-  const values = [item.item_id, item.status, item.email];
+                 VALUES ($1, $2, $3)`;
+  const values = [item.item_id, item.status, item.id];
 
   await pool.query(query, values);
 };
@@ -51,16 +51,22 @@ export const deleteItems = async (items): Promise<void> => {
   await pool.query(query, values);
 };
 
-export const generateNewItems = async (count, email): Promise<any[]> => {
+export const generateNewItems = async (
+  count: number,
+  id: number,
+): Promise<any[]> => {
   const query = `SELECT * FROM fn_generate_item_ids($1, $2)`;
-  const values = [count, email];
+  const values = [count, id];
 
   const result = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const deleteGeneratedItems = async (start, end): Promise<void> => {
+export const deleteGeneratedItems = async (
+  start: string,
+  end: string,
+): Promise<void> => {
   const query = `SELECT * FROM fn_delete_item_ids($1, $2)`;
   const values = [start, end];
 
