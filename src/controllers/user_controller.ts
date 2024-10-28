@@ -1,22 +1,32 @@
+import { Request, Response } from "express";
 import { pool } from "../config/db.js";
+import { generateToken } from "../config/authorization.js";
 import * as userService from "../services/user_services.js";
 
-export const getUserByEmail = async (req, res) => {
+export const getUserByEmail = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const email = req.params.email;
+    const email: string = req.params.email;
+
+    const token = generateToken(email);
 
     await pool.query("BEGIN");
-    const result = await userService.getUserByEmail(email);
+    const result: any[] = await userService.getUserByEmail(email);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result, token });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addNewUser = async (req, res) => {
+export const addNewUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: user } = req.body;
 
@@ -31,7 +41,10 @@ export const addNewUser = async (req, res) => {
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: user } = req.body;
 
@@ -46,7 +59,10 @@ export const updateUser = async (req, res) => {
   }
 };
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: user } = req.body;
 

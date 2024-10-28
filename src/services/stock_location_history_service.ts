@@ -1,25 +1,26 @@
+import { QueryResult } from "pg";
 import { pool } from "../config/db.js";
 import { queryBuilderHelper } from "../helpers/query_builder_helper.js";
 
-export const getAllStockLocationHistory = async () => {
+export const getAllStockLocationHistory = async (): Promise<any[]> => {
   const query = `SELECT * FROM stock_location_history_view ORDER BY date DESC`;
   const values = [];
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const getStockLocationHistory = async (id) => {
+export const getStockLocationHistory = async (id: string): Promise<any[]> => {
   const query = `SELECT * FROM stock_location_history_view WHERE id = $1`;
   const values = [id];
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const addStockLocationHistory = async (history) => {
+export const addStockLocationHistory = async (history): Promise<void> => {
   const query = `INSERT INTO stock_location_history 
                  (group_uuid, items, container_fid, warehouse_location_fid, move_type, status, user_fid) 
                  SELECT $1, $2, containers_view.id, warehouse_locations_view.id, $3, $4, users_view.id 
@@ -40,7 +41,7 @@ export const addStockLocationHistory = async (history) => {
   await pool.query(query, values);
 };
 
-export const updateStockLocationHistory = async (history) => {
+export const updateStockLocationHistory = async (history): Promise<void> => {
   const query = `UPDATE stock_location_history SET 
                  group_uuid = COALESCE($1, group_uuid), 
                  items = COALESCE($2, items), 
@@ -62,26 +63,28 @@ export const updateStockLocationHistory = async (history) => {
   await pool.query(query, values);
 };
 
-export const deleteStockLocationHistory = async (history) => {
+export const deleteStockLocationHistory = async (history): Promise<void> => {
   const query = `DELETE FROM stock_location_history WHERE id = $1`;
   const values = [history.id];
 
   await pool.query(query, values);
 };
 
-export const deleteStockLocationHistories = async (histories) => {
+export const deleteStockLocationHistories = async (
+  histories,
+): Promise<void> => {
   const query = `DELETE FROM stock_location_history WHERE id = ANY($1::INT[])`;
   const values = [histories.map((history) => history.id)];
 
   await pool.query(query, values);
 };
 
-export const queryStockLocationHistory = async (q) => {
+export const queryStockLocationHistory = async (q): Promise<any[]> => {
   q["from"] = "stock_location_history";
 
   const { query, values } = queryBuilderHelper(q);
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
-  return result;
+  return result.rows;
 };

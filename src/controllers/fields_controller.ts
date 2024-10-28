@@ -1,34 +1,42 @@
+import { Request, Response } from "express";
+import { pool } from "../config/db.js";
 import * as fieldsService from "../services/fields_services.js";
 
-export const getAllFields = async (req, res) => {
+export const getAllFields = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await fieldsService.getAllFields();
+    const result: any[] = await fieldsService.getAllFields();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getCategoryFields = async (req, res) => {
+export const getCategoryFields = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const category = req.params.category;
 
     await pool.query("BEGIN");
-    const result = await fieldsService.getCategoryFields(category);
+    const result: any[] = await fieldsService.getCategoryFields(category);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addFields = async (req, res) => {
+export const addFields = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: fields } = req.body;
 
@@ -45,7 +53,10 @@ export const addFields = async (req, res) => {
   }
 };
 
-export const updateFields = async (req, res) => {
+export const updateFields = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: fields } = req.body;
 
@@ -62,7 +73,10 @@ export const updateFields = async (req, res) => {
   }
 };
 
-export const deleteFields = async (req, res) => {
+export const deleteFields = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: fields } = req.body;
 

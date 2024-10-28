@@ -1,24 +1,25 @@
+import { QueryResult } from "pg";
 import { pool } from "../config/db.js";
 
-export const getAllCategories = async () => {
+export const getAllCategories = async (): Promise<any[]> => {
   const query = `SELECT * FROM categories_view ORDER BY category`;
   const values = [];
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const getCategory = async (category) => {
+export const getCategory = async (category: string): Promise<any[]> => {
   const query = `SELECT * FROM categories_view WHERE category = $1`;
   const values = [category];
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const addNewCategory = async (category) => {
+export const addNewCategory = async (category): Promise<void> => {
   const query = `INSERT INTO categories (category, created_by) 
                  SELECT $1, users_view.id FROM users_view 
                  WHERE email = $2`;
@@ -27,14 +28,14 @@ export const addNewCategory = async (category) => {
   await pool.query(query, values);
 };
 
-export const updateCategory = async (category) => {
+export const updateCategory = async (category): Promise<void> => {
   const query = `UPDATE categories SET category = $1 WHERE id = $2`;
   const values = [category.category, category.id];
 
   await pool.query(query, values);
 };
 
-export const deleteCategory = async (category) => {
+export const deleteCategory = async (category): Promise<void> => {
   const query = `DELETE FROM categories WHERE id = $1`;
   const values = [category.id];
 

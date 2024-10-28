@@ -1,34 +1,39 @@
+import { Request, Response } from "express";
+import { pool } from "../config/db.js";
 import * as stockService from "../services/stock_services.js";
 
-export const getAllStocks = async (req, res) => {
+export const getAllStocks = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await stockService.getAllStocks();
+    const result: any[] = await stockService.getAllStocks();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getStock = async (req, res) => {
+export const getStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const itemId = req.params.itemId;
 
     await pool.query("BEGIN");
-    const result = await stockService.getStock(itemId);
+    const result: any[] = await stockService.getStock(itemId);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addStock = async (req, res) => {
+export const addStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: stock } = req.body;
 
@@ -43,7 +48,7 @@ export const addStock = async (req, res) => {
   }
 };
 
-export const addStocks = async (req, res) => {
+export const addStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: stocks } = req.body;
 
@@ -60,7 +65,10 @@ export const addStocks = async (req, res) => {
   }
 };
 
-export const updateStock = async (req, res) => {
+export const updateStock = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: stock } = req.body;
 
@@ -75,7 +83,10 @@ export const updateStock = async (req, res) => {
   }
 };
 
-export const updateStocks = async (req, res) => {
+export const updateStocks = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: stocks } = req.body;
 
@@ -92,7 +103,10 @@ export const updateStocks = async (req, res) => {
   }
 };
 
-export const deleteStock = async (req, res) => {
+export const deleteStock = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: stock } = req.body;
 
@@ -107,7 +121,10 @@ export const deleteStock = async (req, res) => {
   }
 };
 
-export const deleteStocks = async (req, res) => {
+export const deleteStocks = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: stocks } = req.body;
 
@@ -124,15 +141,18 @@ export const deleteStocks = async (req, res) => {
   }
 };
 
-export const queryStocks = async (req, res) => {
+export const queryStocks = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: q } = req.body;
 
     await pool.query("BEGIN");
-    const result = await stockService.queryStocks(q);
+    const result: any[] = await stockService.queryStocks(q);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });

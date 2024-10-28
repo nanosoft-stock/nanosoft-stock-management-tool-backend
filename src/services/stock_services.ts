@@ -1,3 +1,4 @@
+import { QueryResult } from "pg";
 import { pool } from "../config/db.js";
 import { queryBuilderHelper } from "../helpers/query_builder_helper.js";
 import { postProcessStocks } from "../helpers/stock_helper.js";
@@ -15,25 +16,25 @@ const commonColumns = [
   "email",
 ];
 
-export const getAllStocks = async () => {
+export const getAllStocks = async (): Promise<any[]> => {
   const query = `SELECT * FROM stocks_view ORDER BY date DESC, item_id DESC LIMIT 100`;
   const values = [];
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const getStock = async (itemId) => {
+export const getStock = async (itemId: string): Promise<any[]> => {
   const query = `SELECT * FROM stocks_view WHERE item_id = $1`;
   const values = [itemId];
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
   return result.rows;
 };
 
-export const addStock = async (stock) => {
+export const addStock = async (stock): Promise<void> => {
   const stockQuery = `INSERT INTO stocks 
                       (date, item_fid, category_fid, sku_fid, serial_number, container_fid, warehouse_location_fid, supplier_info, comments, user_fid) 
                       SELECT $1, items.id, categories.id, skus.id, $2, containers.id, warehouse_locations.id, $3, $4, users.id 
@@ -60,7 +61,7 @@ export const addStock = async (stock) => {
   const keys = Object.keys(stock);
   const categoryBasedColumns = {};
 
-  for (let key of keys) {
+  for (const key of keys) {
     if (!commonColumns.includes(key)) {
       categoryBasedColumns[key] = stock[key];
     }
@@ -72,7 +73,7 @@ export const addStock = async (stock) => {
   const categoryKey = stock.category.replace(` `, `_`).toLowerCase();
   const categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications 
         (item_fid, ${categoryKeys.join(", ")}) 
-        SELECT items.id, ${categoryKeys.map((_) => `$${index++}`).join(", ")} 
+        SELECT items.id, ${categoryKeys.map(() => `$${index++}`).join(", ")} 
         FROM items WHERE items.item_id = $${index++}`;
   const categoryBasedValues = [
     ...Object.values(categoryBasedColumns),
@@ -83,7 +84,7 @@ export const addStock = async (stock) => {
   await pool.query(categoryBasedQuery, categoryBasedValues);
 };
 
-export const updateStock = async (stock) => {
+export const updateStock = async (stock): Promise<void> => {
   const stockQuery = `UPDATE stocks SET
    item_fid = COALESCE((SELECT id FROM items WHERE item_id = $1), item_fid), 
    category_fid = COALESCE((SELECT id FROM categories WHERE category_id = $2), category_fid), 
@@ -110,7 +111,7 @@ export const updateStock = async (stock) => {
   const keys = Object.keys(stock);
   const categoryBasedColumns = {};
 
-  for (let key of keys) {
+  for (const key of keys) {
     if (!commonColumns.includes(key)) {
       categoryBasedColumns[key] = stock[key];
     }
@@ -133,7 +134,7 @@ export const updateStock = async (stock) => {
   await pool.query(categoryBasedQuery, categoryBasedValues);
 };
 
-export const deleteStock = async (stock) => {
+export const deleteStock = async (stock): Promise<void> => {
   const stocksQuery = `DELETE FROM stocks 
                        USING items 
                        WHERE items.id = stocks.item_fid AND items.item_id = $1`;
@@ -149,12 +150,12 @@ export const deleteStock = async (stock) => {
   await pool.query(stocksQuery, stocksValues);
 };
 
-export const queryStocks = async (q) => {
+export const queryStocks = async (q): Promise<any[]> => {
   q[`from`] = `stocks`;
 
   const { query, values } = queryBuilderHelper(q);
 
-  const result = await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
 
-  return postProcessStocks(result);
+  return postProcessStocks(result.rows);
 };

@@ -1,37 +1,47 @@
+import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as warehouseLocationService from "../services/warehouse_location_services.js";
 
-export const getAllWarehouseLocations = async (req, res) => {
+export const getAllWarehouseLocations = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await warehouseLocationService.getAllWarehouseLocations();
+    const result: any[] =
+      await warehouseLocationService.getAllWarehouseLocations();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getWarehouseLocation = async (req, res) => {
+export const getWarehouseLocation = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const warehouseLocationId = req.params.warehouseLocationId;
 
     await pool.query("BEGIN");
-    const result = await warehouseLocationService.getWarehouseLocation(
-      warehouseLocationId
-    );
+    const result: any[] =
+      await warehouseLocationService.getWarehouseLocation(warehouseLocationId);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addWarehouseLocation = async (req, res) => {
+export const addWarehouseLocation = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: warehouseLocation } = req.body;
 
@@ -46,14 +56,17 @@ export const addWarehouseLocation = async (req, res) => {
   }
 };
 
-export const addWarehouseLocations = async (req, res) => {
+export const addWarehouseLocations = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: warehouseLocations } = req.body;
 
     await pool.query("BEGIN");
     for (let i = 0; i < warehouseLocations.length; i++) {
       await warehouseLocationService.addWarehouseLocation(
-        warehouseLocations[i]
+        warehouseLocations[i],
       );
     }
     await pool.query("COMMIT");
@@ -65,7 +78,10 @@ export const addWarehouseLocations = async (req, res) => {
   }
 };
 
-export const updateWarehouseLocation = async (req, res) => {
+export const updateWarehouseLocation = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: warehouseLocation } = req.body;
 
@@ -80,14 +96,17 @@ export const updateWarehouseLocation = async (req, res) => {
   }
 };
 
-export const updateWarehouseLocations = async (req, res) => {
+export const updateWarehouseLocations = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: warehouseLocations } = req.body;
 
     await pool.query("BEGIN");
     for (let i = 0; i < warehouseLocations.length; i++) {
       await warehouseLocationService.updateWarehouseLocation(
-        warehouseLocations[i]
+        warehouseLocations[i],
       );
     }
     await pool.query("COMMIT");
@@ -99,7 +118,10 @@ export const updateWarehouseLocations = async (req, res) => {
   }
 };
 
-export const deleteWarehouseLocation = async (req, res) => {
+export const deleteWarehouseLocation = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: warehouseLocation } = req.body;
 
@@ -114,7 +136,10 @@ export const deleteWarehouseLocation = async (req, res) => {
   }
 };
 
-export const deleteWarehouseLocations = async (req, res) => {
+export const deleteWarehouseLocations = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: warehouseLocations } = req.body;
 

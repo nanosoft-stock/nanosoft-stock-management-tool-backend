@@ -1,6 +1,6 @@
-export const postProcessStocks = (stocks) => {
+export const postProcessStocks = (stocks: any[]): any[] => {
   for (let i = 0; i < stocks.length; i++) {
-    let stock = stocks[i];
+    const stock = stocks[i];
 
     if ("category" in stock) {
       const categoryKey = stock.category.replace(" ", "_").toLowerCase();
@@ -15,5 +15,6 @@ export const postProcessStocks = (stocks) => {
       }
     }
   }
+
   return stocks;
 };
