@@ -1,35 +1,45 @@
+import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as containerService from "../services/container_services.js";
 
-export const getAllContainers = async (req, res) => {
+export const getAllContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await containerService.getAllContainers();
+    const result: any[] = await containerService.getAllContainers();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getContainer = async (req, res) => {
+export const getContainer = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const containerId = req.params.containerId;
+    const containerId: string = req.params.containerId;
 
     await pool.query("BEGIN");
-    const result = await containerService.getContainer(containerId);
+    const result: any[] = await containerService.getContainer(containerId);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addContainer = async (req, res) => {
+export const addContainer = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: container } = req.body;
 
@@ -44,14 +54,16 @@ export const addContainer = async (req, res) => {
   }
 };
 
-export const addContainers = async (req, res) => {
+export const addContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: containers } = req.body;
 
     await pool.query("BEGIN");
     for (let i = 0; i < containers.length; i++) {
-      const container = containers[i];
-      await containerService.addContainer(container);
+      await containerService.addContainer(containers[i]);
     }
     await pool.query("COMMIT");
 
@@ -62,7 +74,10 @@ export const addContainers = async (req, res) => {
   }
 };
 
-export const updateContainer = async (req, res) => {
+export const updateContainer = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: container } = req.body;
 
@@ -77,7 +92,10 @@ export const updateContainer = async (req, res) => {
   }
 };
 
-export const updateContainers = async (req, res) => {
+export const updateContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: containers } = req.body;
 
@@ -94,7 +112,10 @@ export const updateContainers = async (req, res) => {
   }
 };
 
-export const deleteContainer = async (req, res) => {
+export const deleteContainer = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: container } = req.body;
 
@@ -109,7 +130,10 @@ export const deleteContainer = async (req, res) => {
   }
 };
 
-export const deleteContainers = async (req, res) => {
+export const deleteContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: containers } = req.body;
 
@@ -124,22 +148,31 @@ export const deleteContainers = async (req, res) => {
   }
 };
 
-export const generateNewContainers = async (req, res) => {
+export const generateNewContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const { count, email } = req.body.data;
+    const { count, user_id: userId } = req.body.data;
 
     await pool.query("BEGIN");
-    const result = await containerService.generateNewContainers(count, email);
+    const result: any[] = await containerService.generateNewContainers(
+      count,
+      userId,
+    );
     await pool.query("COMMIT");
 
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const deleteGeneratedContainers = async (req, res) => {
+export const deleteGeneratedContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { start, end } = req.body.data;
 

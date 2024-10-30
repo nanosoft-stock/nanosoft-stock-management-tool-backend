@@ -1,34 +1,45 @@
+import { Request, Response } from "express";
+import { pool } from "../config/db.js";
 import * as slhService from "../services/stock_location_history_service.js";
 
-export const getAllStockLocationHistory = async (req, res) => {
+export const getAllStockLocationHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await slhService.getAllStockLocationHistory();
+    const result: any[] = await slhService.getAllStockLocationHistory();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getStockLocationHistory = async (req, res) => {
+export const getStockLocationHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const id = req.params.id;
 
     await pool.query("BEGIN");
-    const result = await slhService.getStockLocationHistory(id);
+    const result: any[] = await slhService.getStockLocationHistory(id);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addStockLocationHistory = async (req, res) => {
+export const addStockLocationHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: history } = req.body;
 
@@ -43,7 +54,10 @@ export const addStockLocationHistory = async (req, res) => {
   }
 };
 
-export const addStockLocationHistories = async (req, res) => {
+export const addStockLocationHistories = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: histories } = req.body;
 
@@ -60,7 +74,10 @@ export const addStockLocationHistories = async (req, res) => {
   }
 };
 
-export const updateStockLocationHistory = async (req, res) => {
+export const updateStockLocationHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: history } = req.body;
 
@@ -75,7 +92,10 @@ export const updateStockLocationHistory = async (req, res) => {
   }
 };
 
-export const updateStockLocationHistories = async (req, res) => {
+export const updateStockLocationHistories = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: histories } = req.body;
 
@@ -92,7 +112,10 @@ export const updateStockLocationHistories = async (req, res) => {
   }
 };
 
-export const deleteStockLocationHistory = async (req, res) => {
+export const deleteStockLocationHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: history } = req.body;
 
@@ -107,7 +130,10 @@ export const deleteStockLocationHistory = async (req, res) => {
   }
 };
 
-export const deleteStockLocationHistories = async (req, res) => {
+export const deleteStockLocationHistories = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: histories } = req.body;
 
@@ -122,15 +148,18 @@ export const deleteStockLocationHistories = async (req, res) => {
   }
 };
 
-export const queryStockLocationHistory = async (req, res) => {
+export const queryStockLocationHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: q } = req.body;
 
     await pool.query("BEGIN");
-    const result = await slhService.queryStockLocationHistory(q);
+    const result: any[] = await slhService.queryStockLocationHistory(q);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });

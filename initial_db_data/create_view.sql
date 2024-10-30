@@ -92,9 +92,9 @@ AS
         warehouse_locations.warehouse_location_id AS warehouse_location_id,
         CASE
             WHEN (stocks.category_fid = 1) THEN row_to_json(docking_station_specifications)
-            WHEN (stocks.category_fid = 0) THEN row_to_json(graphics_card_specifications)
-            WHEN (stocks.category_fid = 2) THEN row_to_json(laptop_specifications)
-            WHEN (stocks.category_fid = 3) THEN row_to_json(tft_specifications)
+            WHEN (stocks.category_fid = 2) THEN row_to_json(graphics_card_specifications)
+            WHEN (stocks.category_fid = 3) THEN row_to_json(laptop_specifications)
+            WHEN (stocks.category_fid = 4) THEN row_to_json(tft_specifications)
             ELSE NULL
         END AS specifications,
         supplier_info,

@@ -1,35 +1,39 @@
+import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as itemService from "../services/item_services.js";
 
-export const getAllItems = async (req, res) => {
+export const getAllItems = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await itemService.getAllItems();
+    const result: any[] = await itemService.getAllItems();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getItem = async (req, res) => {
+export const getItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const itemId = req.params.itemId;
 
     await pool.query("BEGIN");
-    const result = await itemService.getItem(itemId);
+    const result: any[] = await itemService.getItem(itemId);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addItem = async (req, res) => {
+export const addItem = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: item } = req.body;
 
@@ -44,7 +48,7 @@ export const addItem = async (req, res) => {
   }
 };
 
-export const addItems = async (req, res) => {
+export const addItems = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: items } = req.body;
 
@@ -61,7 +65,10 @@ export const addItems = async (req, res) => {
   }
 };
 
-export const updateItem = async (req, res) => {
+export const updateItem = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: item } = req.body;
 
@@ -76,7 +83,10 @@ export const updateItem = async (req, res) => {
   }
 };
 
-export const updateItems = async (req, res) => {
+export const updateItems = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: items } = req.body;
 
@@ -93,7 +103,10 @@ export const updateItems = async (req, res) => {
   }
 };
 
-export const deleteItem = async (req, res) => {
+export const deleteItem = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: item } = req.body;
 
@@ -108,7 +121,10 @@ export const deleteItem = async (req, res) => {
   }
 };
 
-export const deleteItems = async (req, res) => {
+export const deleteItems = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: items } = req.body;
 
@@ -123,22 +139,28 @@ export const deleteItems = async (req, res) => {
   }
 };
 
-export const generateNewItems = async (req, res) => {
+export const generateNewItems = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const { count, email } = req.body.data;
+    const { count, user_id: userId } = req.body.data;
 
     await pool.query("BEGIN");
-    const result = await itemService.generateNewItems(count, email);
+    const result: any[] = await itemService.generateNewItems(count, userId);
     await pool.query("COMMIT");
 
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const deleteGeneratedItems = async (req, res) => {
+export const deleteGeneratedItems = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { start, end } = req.body.data;
 

@@ -39,7 +39,7 @@ export const queryBuilderHelper = (q) => {
   // WHERE
   if (where !== undefined && Object.keys(where).length > 0) {
     query += "WHERE ";
-    let w = buildWhereClause(where, values, index);
+    const w = buildWhereClause(where, values, index);
     query += w.query + " ";
     values = w.values;
     index = w.index;
@@ -80,10 +80,10 @@ const buildWhereClause = (where, values, index) => {
   let query = "";
 
   if (where.type === "AND") {
-    let ands = [];
+    const ands = [];
 
     for (let i = 0; i < where.nodes.length; i++) {
-      let w = buildWhereClause(where.nodes[i], values, index);
+      const w = buildWhereClause(where.nodes[i], values, index);
 
       ands.push(w.query);
       values = w.values;
@@ -92,10 +92,10 @@ const buildWhereClause = (where, values, index) => {
 
     query = "(" + ands.join(" AND ") + ")";
   } else if (where.type === "OR") {
-    let ors = [];
+    const ors = [];
 
     for (let i = 0; i < where.nodes.length; i++) {
-      let w = buildWhereClause(where.nodes[i], values, index);
+      const w = buildWhereClause(where.nodes[i], values, index);
 
       ors.push(w.query);
       values = w.values;
@@ -104,12 +104,12 @@ const buildWhereClause = (where, values, index) => {
 
     query = "(" + ors.join(" OR ") + ")";
   } else {
-    let data = where.data;
+    const data = where.data;
 
     if (data.op === "IN") {
       query = `${data.field}${data.not === true ? " NOT " : " "}${
         data.op
-      } (${data.value.map((_) => `$${index++}`).join(", ")})`;
+      } (${data.value.map(() => `$${index++}`).join(", ")})`;
 
       values.push(...data.value);
     } else {

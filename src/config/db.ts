@@ -1,17 +1,16 @@
 import pg from "pg";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
+import "reflect-metadata";
 import { io } from "../server.js";
 
 dotenv.config();
 
-const { Pool } = pg;
-
-export const pool = new Pool({
+export const pool = new pg.Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT),
   ssl: {
     rejectUnauthorized: false,
   },
@@ -23,7 +22,7 @@ const notificationHandler = (message) => {
   io.emit("database", payload);
 };
 
-pool.connect(async (error, client, done) => {
+pool.connect(async (error, client) => {
   if (error) {
     console.error("Error connecting to the database:", error);
   } else {
@@ -34,17 +33,17 @@ pool.connect(async (error, client, done) => {
   }
 });
 
-export const executeQuery = async (query, values) => {
-  try {
-    pool.query("BEGIN");
-
-    const result = await pool.query(query, values);
-
-    pool.query("COMMIT");
-    
-    return result.rows;
-  } catch (error) {
-    pool.query("ROLLBACK");
-    throw error;
-  }
-};
+//export const executeQuery = async (query, values) => {
+//  try {
+//    pool.query("BEGIN");
+//
+//    const result = await pool.query(query, values);
+//
+//    pool.query("COMMIT");
+//
+//    return result.rows;
+//  } catch (error) {
+//    pool.query("ROLLBACK");
+//    throw error;
+//  }
+//};

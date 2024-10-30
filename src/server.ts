@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
-import http from "http";
+import * as dotenv from "dotenv";
+import * as http from "http";
 import { Server } from "socket.io";
 import app from "./app.js";
 
@@ -16,6 +16,6 @@ io.on("connection", (socket) => {
 
 server.listen(PORT, () => {
   console.log(
-    `Server is running on port ${PORT} in ${process.env.NODE_ENV} mode.`
+    `Server is running on port ${PORT} in ${process.env.NODE_ENV} mode.`,
   );
 });

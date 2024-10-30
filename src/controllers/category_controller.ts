@@ -1,35 +1,45 @@
+import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as categoryService from "../services/category_services.js";
 
-export const getAllCategories = async (req, res) => {
+export const getAllCategories = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     await pool.query("BEGIN");
-    const result = await categoryService.getAllCategories();
+    const result: any[] = await categoryService.getAllCategories();
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const getCategory = async (req, res) => {
+export const getCategory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const category = req.params.category;
+    const category: string = req.params.category;
 
     await pool.query("BEGIN");
-    const result = await categoryService.getCategory(category);
+    const result: any[] = await categoryService.getCategory(category);
     await pool.query("COMMIT");
 
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
   }
 };
 
-export const addNewCategory = async (req, res) => {
+export const addNewCategory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: category } = req.body;
 
@@ -44,7 +54,10 @@ export const addNewCategory = async (req, res) => {
   }
 };
 
-export const updateCategory = async (req, res) => {
+export const updateCategory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: category } = req.body;
 
@@ -59,7 +72,10 @@ export const updateCategory = async (req, res) => {
   }
 };
 
-export const deleteCategory = async (req, res) => {
+export const deleteCategory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { data: category } = req.body;
 
