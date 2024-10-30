@@ -53,10 +53,10 @@ export const deleteItems = async (items): Promise<void> => {
 
 export const generateNewItems = async (
   count: number,
-  id: number,
+  userId: number,
 ): Promise<any[]> => {
   const query = `SELECT * FROM fn_generate_item_ids($1, $2)`;
-  const values = [count, id];
+  const values = [count, userId];
 
   const result = await pool.query(query, values);
 

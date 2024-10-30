@@ -153,12 +153,12 @@ export const generateNewContainers = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { count, email } = req.body.data;
+    const { count, user_id: userId } = req.body.data;
 
     await pool.query("BEGIN");
     const result: any[] = await containerService.generateNewContainers(
       count,
-      email,
+      userId,
     );
     await pool.query("COMMIT");
 

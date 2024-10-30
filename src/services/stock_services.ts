@@ -147,7 +147,7 @@ export const deleteStock = async (stock): Promise<void> => {
 };
 
 export const queryStocks = async (q): Promise<any[]> => {
-  q["from"] = "stocks";
+  q["from"] = "stocks_view";
 
   const { query, values } = queryBuilderHelper(q);
 

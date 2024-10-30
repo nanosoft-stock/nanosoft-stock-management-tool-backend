@@ -144,10 +144,10 @@ export const generateNewItems = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { count, email } = req.body.data;
+    const { count, user_id: userId } = req.body.data;
 
     await pool.query("BEGIN");
-    const result: any[] = await itemService.generateNewItems(count, email);
+    const result: any[] = await itemService.generateNewItems(count, userId);
     await pool.query("COMMIT");
 
     res.status(201).json({ data: result });
