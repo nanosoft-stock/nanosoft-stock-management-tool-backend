@@ -16,12 +16,6 @@ export const pool = new pg.Pool({
   },
 });
 
-const notificationHandler = (message) => {
-  const payload = JSON.parse(message.payload);
-
-  io.emit("database", payload);
-};
-
 pool.connect(async (error, client) => {
   if (error) {
     console.error("Error connecting to the database:", error);
@@ -32,6 +26,12 @@ pool.connect(async (error, client) => {
     client.query("LISTEN table_update");
   }
 });
+
+const notificationHandler = (message) => {
+  const payload = JSON.parse(message.payload);
+
+  io.emit("database", payload);
+};
 
 //export const executeQuery = async (query, values) => {
 //  try {

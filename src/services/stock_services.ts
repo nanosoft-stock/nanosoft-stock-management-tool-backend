@@ -13,7 +13,7 @@ const commonColumns = [
   "warehouse_location_id",
   "supplier_info",
   "comments",
-  "email",
+  "user_id",
 ];
 
 export const getAllStocks = async (): Promise<any[]> => {

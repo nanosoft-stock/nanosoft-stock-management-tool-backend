@@ -22,7 +22,7 @@ export const getCategoryFields = async (category: string): Promise<any[]> => {
 export const addField = async (field): Promise<void> => {
   const query = `INSERT INTO fields 
                  (field, category_fid, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order, created_by) 
-                 SELECT ($1, categories.id, $2, $3, $4, $5, $6, $7, $8, $9) 
+                 SELECT $1, categories.id, $2, $3, $4, $5, $6, $7, $8, $9 
                  FROM categories WHERE category = $10`;
   const values = [
     field.field,

@@ -1,5 +1,6 @@
 import express from "express";
 import userRouter from "./routes/user_routes.js";
+import tableRouter from "./routes/table_routes.js";
 import categoryRouter from "./routes/category_routes.js";
 import itemRouter from "./routes/item_routes.js";
 import containerRouter from "./routes/container_routes.js";
@@ -12,11 +13,11 @@ import { authorizeUser } from "./config/authorization.js";
 
 const app = express();
 
-//app.use(express.json());
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 
 app.use("/users", userRouter);
+app.use("/tables", authorizeUser, tableRouter);
 app.use("/categories", authorizeUser, categoryRouter);
 app.use("/items", authorizeUser, itemRouter);
 app.use("/containers", authorizeUser, containerRouter);
