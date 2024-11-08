@@ -19,6 +19,7 @@ export const createNewTable = async (
     res.status(500).json({ error });
   }
 };
+
 export const addNewTableFields = async (
   req: Request,
   res: Response,
@@ -39,6 +40,7 @@ export const addNewTableFields = async (
     res.status(500).json({ error });
   }
 };
+
 export const updateTableFields = async (
   req: Request,
   res: Response,
@@ -59,6 +61,7 @@ export const updateTableFields = async (
     res.status(500).json({ error });
   }
 };
+
 export const deleteTableFields = async (
   req: Request,
   res: Response,

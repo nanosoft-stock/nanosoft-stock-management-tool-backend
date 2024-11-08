@@ -80,6 +80,50 @@ export const createNewTable = async (table): Promise<void> => {
   const stocksViewValues = [];
 
   await pool.query(stocksViewQuery, stocksViewValues);
+
+  // Create Notification Functions and Triggers
+  const notificationQuery = `CREATE OR REPLACE FUNCTION fn_${toLowerSnakeCase(table.category)}_specifications_notify_event() RETURNS trigger AS $$
+                             DECLARE
+                                 view_data JSON;
+                                 payload JSON;
+                             BEGIN
+                                 IF TG_OP = 'DELETE' THEN
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+                                 ELSE
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+                                 END IF;
+
+                                 payload = json_build_object(
+                                         'table', TG_TABLE_NAME,
+                                         'operation', TG_OP,
+                                         'data', view_data);
+
+                                 PERFORM pg_notify('table_update', payload::TEXT);
+
+                                 IF TG_OP = 'DELETE' THEN
+                                     RETURN OLD;
+                                 ELSE 
+                                     RETURN NEW;
+                                 END IF;
+                             END
+                             $$ LANGUAGE plpgsql;
+
+
+                         CREATE OR REPLACE TRIGGER tg_${toLowerSnakeCase(table.category)}_specifications_insert_or_update
+                             AFTER INSERT OR UPDATE 
+                             ON ${toLowerSnakeCase(table.category)}_specifications
+                             FOR EACH ROW
+                                 EXECUTE PROCEDURE fn_${toLowerSnakeCase(table.category)}_specifications_notify_event();
+
+
+                         CREATE OR REPLACE TRIGGER tg_${toLowerSnakeCase(table.category)}_specifications_delete
+                             BEFORE DELETE
+                             ON ${toLowerSnakeCase(table.category)}_specifications
+                             FOR EACH ROW
+                                  EXECUTE PROCEDURE fn_${toLowerSnakeCase(table.category)}_specifications_notify_event();`;
+  const notificationValues = [];
+
+  await pool.query(notificationQuery, notificationValues);
 };
 
 export const addNewTableFields = async (category, field): Promise<void> => {
