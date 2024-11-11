@@ -13,6 +13,7 @@ const commonColumns = [
   "supplier info",
   "comments",
   "username",
+  "is dispatched",
 ];
 
 export const createNewTable = async (table): Promise<void> => {
@@ -33,7 +34,7 @@ export const createNewTable = async (table): Promise<void> => {
                          ${categoryFields.map((e) => `${toLowerSnakeCase(e.field)} VARCHAR(255)`).join(", \n")}, 
 
                          PRIMARY KEY(id), 
-                        UNIQUE(item_fid), 
+                         UNIQUE(item_fid), 
                          FOREIGN KEY (item_fid) REFERENCES items(id) 
                          )`;
   const newTableValues = [];

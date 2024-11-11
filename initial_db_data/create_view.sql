@@ -99,7 +99,8 @@ AS
         END AS specifications,
         supplier_info,
         comments,
-        users.username AS username
+        users.username AS username,
+        is_dispatched
     FROM stocks
         LEFT JOIN items ON items.id = stocks.item_fid
         LEFT JOIN categories ON categories.id = stocks.category_fid

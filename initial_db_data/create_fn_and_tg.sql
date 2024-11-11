@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION fn_users_notify_event() RETURNS trigger AS $$
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -30,7 +30,7 @@ CREATE OR REPLACE TRIGGER tg_users_insert_or_update
     ON users
     FOR EACH ROW
         EXECUTE PROCEDURE fn_users_notify_event();
-        
+
 
 CREATE OR REPLACE TRIGGER tg_users_delete
     BEFORE DELETE
@@ -52,12 +52,12 @@ CREATE OR REPLACE FUNCTION fn_categories_notify_event() RETURNS trigger AS $$
         ELSE
             SELECT row_to_json(categories_view) INTO view_data FROM categories_view WHERE id = NEW.id;
         END IF;
-        
+
         payload = json_build_object(
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -74,8 +74,8 @@ CREATE OR REPLACE TRIGGER tg_categories_insert_or_update
     ON categories
     FOR EACH ROW
         EXECUTE PROCEDURE fn_categories_notify_event();
-        
-        
+
+
 CREATE OR REPLACE TRIGGER tg_categories_delete
     BEFORE DELETE
     ON categories
@@ -101,7 +101,7 @@ CREATE OR REPLACE FUNCTION fn_warehouse_locations_notify_event() RETURNS trigger
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -118,7 +118,7 @@ CREATE OR REPLACE TRIGGER tg_warehouse_locations_insert_or_update
     ON warehouse_locations
     FOR EACH ROW
         EXECUTE PROCEDURE fn_warehouse_locations_notify_event();
-    
+
 
 CREATE OR REPLACE TRIGGER tg_warehouse_locations_delete
     BEFORE DELETE
@@ -145,7 +145,7 @@ CREATE OR REPLACE FUNCTION fn_containers_notify_event() RETURNS trigger AS $$
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -162,7 +162,7 @@ CREATE OR REPLACE TRIGGER tg_containers_insert_or_update
     ON containers
     FOR EACH ROW
         EXECUTE PROCEDURE fn_containers_notify_event();
-        
+
 
 CREATE OR REPLACE TRIGGER tg_containers_delete
     BEFORE DELETE
@@ -189,7 +189,7 @@ CREATE OR REPLACE FUNCTION fn_items_notify_event() RETURNS trigger AS $$
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -233,7 +233,7 @@ CREATE OR REPLACE FUNCTION fn_fields_notify_event() RETURNS trigger AS $$
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -250,8 +250,8 @@ CREATE OR REPLACE TRIGGER tg_fields_insert_or_update
     ON fields
     FOR EACH ROW
         EXECUTE PROCEDURE fn_fields_notify_event();
-        
-        
+
+
 CREATE OR REPLACE TRIGGER tg_fields_delete
     BEFORE DELETE
     ON fields
@@ -277,7 +277,7 @@ CREATE OR REPLACE FUNCTION fn_skus_notify_event() RETURNS trigger AS $$
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -321,7 +321,7 @@ CREATE OR REPLACE FUNCTION fn_stocks_notify_event() RETURNS trigger AS $$
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -338,8 +338,8 @@ CREATE OR REPLACE TRIGGER tg_stocks_insert_or_update
     ON stocks
     FOR EACH ROW
         EXECUTE PROCEDURE fn_stocks_notify_event();
-        
-        
+
+
 CREATE OR REPLACE TRIGGER tg_stocks_delete
     BEFORE DELETE
     ON stocks
@@ -365,7 +365,7 @@ CREATE OR REPLACE FUNCTION fn_docking_station_specifications_notify_event() RETU
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -382,7 +382,7 @@ CREATE OR REPLACE TRIGGER tg_docking_station_specifications_insert_or_update
     ON docking_station_specifications
     FOR EACH ROW
         EXECUTE PROCEDURE fn_docking_station_specifications_notify_event();
-        
+
 
 CREATE OR REPLACE TRIGGER tg_docking_station_specifications_delete
     BEFORE DELETE
@@ -409,7 +409,7 @@ CREATE OR REPLACE FUNCTION fn_graphics_card_specifications_notify_event() RETURN
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -453,7 +453,7 @@ CREATE OR REPLACE FUNCTION fn_laptop_specifications_notify_event() RETURNS trigg
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -470,7 +470,7 @@ CREATE OR REPLACE TRIGGER tg_laptop_specifications_insert_or_update
     ON laptop_specifications
     FOR EACH ROW
         EXECUTE PROCEDURE fn_laptop_specifications_notify_event();
-        
+
 
 CREATE OR REPLACE TRIGGER tg_laptop_specifications_delete
     BEFORE DELETE
@@ -497,7 +497,7 @@ CREATE OR REPLACE FUNCTION fn_tft_specifications_notify_event() RETURNS trigger 
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -514,7 +514,7 @@ CREATE OR REPLACE TRIGGER tg_tft_specifications_insert_or_update
     ON tft_specifications
     FOR EACH ROW
         EXECUTE PROCEDURE fn_tft_specifications_notify_event();
-        
+
 
 CREATE OR REPLACE TRIGGER tg_tft_specifications_delete
     BEFORE DELETE
@@ -541,7 +541,7 @@ CREATE OR REPLACE FUNCTION fn_stock_location_history_notify_event() RETURNS trig
                 'table', TG_TABLE_NAME,
                 'operation', TG_OP,
                 'data', view_data);
-        
+
         PERFORM pg_notify('table_update', payload::TEXT);
 
         IF TG_OP = 'DELETE' THEN
@@ -558,8 +558,8 @@ CREATE OR REPLACE TRIGGER tg_stock_location_history_insert_or_update
     ON stock_location_history
     FOR EACH ROW
         EXECUTE PROCEDURE fn_stock_location_history_notify_event();
-        
-        
+
+
 CREATE OR REPLACE TRIGGER tg_stock_location_history_delete
     BEFORE DELETE
     ON stock_location_history
@@ -788,25 +788,34 @@ CREATE OR REPLACE TRIGGER tg_warehouse_location_stock_added
 CREATE OR REPLACE FUNCTION fn_item_location_updated() RETURNS TRIGGER AS $$
     DECLARE
         element VARCHAR(10);
+        is_dispatch BOOLEAN;
     BEGIN
         IF 
             NEW.group_uuid IS NOT NULL AND NEW.status = 'completed'
         THEN
             FOREACH element IN ARRAY NEW.items
             LOOP
+                is_dispatch := false;
+
+                IF (SELECT container_id FROM containers WHERE id = NEW.container_fid) = 'ST0000000' AND (SELECT warehouse_location_id FROM warehouse_locations WHERE id = NEW.warehouse_location_fid) = 'DISPATCH' THEN
+                    is_dispatch = true;
+                END IF;
+
                 UPDATE 
                     stocks 
                 SET 
-                    container_fid = NEW.container_fid, warehouse_location_fid = NEW.warehouse_location_fid 
+                    container_fid = NEW.container_fid, 
+                    warehouse_location_fid = NEW.warehouse_location_fid, 
+                    is_dispatched = is_dispatch 
                 FROM 
                     items 
                 WHERE 
-                    items.item_fid = stocks.item_fid AND items.item_id = element;
+                    items.id = stocks.item_fid AND items.item_id = element;
 
                 IF 
                     (SELECT warehouse_location_fid FROM containers WHERE id = NEW.container_fid) <> NEW.warehouse_location_fid
                 THEN
-                    UPDATE containers SET warehouse_location_fid = NEW.warehouse_location_fid WHERE id = NEW.container_id;
+                    UPDATE containers SET warehouse_location_fid = NEW.warehouse_location_fid WHERE id = NEW.container_fid;
                 END IF;
 
             END LOOP;
@@ -822,6 +831,13 @@ CREATE OR REPLACE TRIGGER tg_item_location_updated
     ON stock_location_history
     FOR EACH ROW
         EXECUTE PROCEDURE fn_item_location_updated();
+
+
+-------------------------------------------------------------------------------
+
+
+CREATE INDEX IF NOT EXISTS unique_serial_number_for_not_dispatched_stocks ON stocks (serial_number)
+    WHERE is_dispatched = false;
 
 
 -------------------------------------------------------------------------------

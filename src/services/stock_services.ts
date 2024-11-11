@@ -14,6 +14,7 @@ const commonColumns = [
   "supplier_info",
   "comments",
   "user_id",
+  //"is_dispatched",
 ];
 
 export const getAllStocks = async (): Promise<any[]> => {
