@@ -356,13 +356,13 @@ CREATE OR REPLACE FUNCTION fn_docking_station_specifications_notify_event() RETU
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
         END IF;
 
         payload = json_build_object(
-                'table', TG_TABLE_NAME,
+                'table', 'stocks',
                 'operation', TG_OP,
                 'data', view_data);
 
@@ -400,13 +400,13 @@ CREATE OR REPLACE FUNCTION fn_graphics_card_specifications_notify_event() RETURN
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
         END IF;
 
         payload = json_build_object(
-                'table', TG_TABLE_NAME,
+                'table', 'stocks',
                 'operation', TG_OP,
                 'data', view_data);
 
@@ -444,13 +444,13 @@ CREATE OR REPLACE FUNCTION fn_laptop_specifications_notify_event() RETURNS trigg
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
         END IF;
 
         payload = json_build_object(
-                'table', TG_TABLE_NAME,
+                'table', 'stocks',
                 'operation', TG_OP,
                 'data', view_data);
 
@@ -488,13 +488,13 @@ CREATE OR REPLACE FUNCTION fn_tft_specifications_notify_event() RETURNS trigger 
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
         END IF;
 
         payload = json_build_object(
-                'table', TG_TABLE_NAME,
+                'table', 'stocks',
                 'operation', TG_OP,
                 'data', view_data);
 

@@ -89,13 +89,13 @@ export const createNewTable = async (table): Promise<void> => {
                                  payload JSON;
                              BEGIN
                                  IF TG_OP = 'DELETE' THEN
-                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
                                  ELSE
-                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
                                  END IF;
 
                                  payload = json_build_object(
-                                         'table', TG_TABLE_NAME,
+                                         'table', 'stocks',
                                          'operation', TG_OP,
                                          'data', view_data);
 

@@ -14,7 +14,6 @@ const commonColumns = [
   "supplier_info",
   "comments",
   "user_id",
-  //"is_dispatched",
 ];
 
 export const getAllStocks = async (): Promise<any[]> => {
@@ -66,21 +65,25 @@ export const addStock = async (stock): Promise<void> => {
     }
   }
 
+  await pool.query(stockQuery, stockValues);
+
   const categoryKeys = Object.keys(categoryBasedColumns);
 
-  let index = 1;
-  const categoryKey = stock.category.replace(` `, `_`).toLowerCase();
-  const categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications 
-                              (item_fid, ${categoryKeys.join(", ")}) 
-                              SELECT items.id, ${categoryKeys.map(() => `$${index++}`).join(", ")} 
-                              FROM items WHERE items.item_id = $${index++}`;
-  const categoryBasedValues = [
-    ...Object.values(categoryBasedColumns),
-    stock.item_id,
-  ];
+  if (categoryKeys.length != 0) {
+    let index = 1;
+    const categoryKey = stock.category.replace(` `, `_`).toLowerCase();
 
-  await pool.query(stockQuery, stockValues);
-  await pool.query(categoryBasedQuery, categoryBasedValues);
+    const categoryBasedQuery = `INSERT INTO ${categoryKey}_specifications 
+                                (item_fid, ${categoryKeys.join(", ")}) 
+                                SELECT items.id, ${categoryKeys.map(() => `$${index++}`).join(", ")} 
+                                FROM items WHERE items.item_id = $${index++}`;
+    const categoryBasedValues = [
+      ...Object.values(categoryBasedColumns),
+      stock.item_id,
+    ];
+
+    await pool.query(categoryBasedQuery, categoryBasedValues);
+  }
 };
 
 export const updateStock = async (stock): Promise<void> => {
@@ -115,20 +118,24 @@ export const updateStock = async (stock): Promise<void> => {
     }
   }
 
+  await pool.query(stockQuery, stockValues);
+
   const categoryKeys = Object.keys(categoryBasedColumns);
 
-  let index = 1;
-  const categoryKey = stock.category.replace(" ", "_").toLowerCase();
-  const categoryBasedQuery = `UPDATE ${categoryKey}_specifications 
-                              ${categoryKeys.map((key) => `${key} = COALESCE(${index++}, ${key})`).join(", ")}
-                              WHERE item_fid = (SELECT id FROM items WHERE item_id = ${index++})`;
-  const categoryBasedValues = [
-    ...categoryKeys.map((key) => stock[key]),
-    stock.item_id,
-  ];
+  if (categoryKeys.length != 0) {
+    let index = 1;
+    const categoryKey = stock.category.replace(" ", "_").toLowerCase();
 
-  await pool.query(stockQuery, stockValues);
-  await pool.query(categoryBasedQuery, categoryBasedValues);
+    const categoryBasedQuery = `UPDATE ${categoryKey}_specifications 
+                                ${categoryKeys.map((key) => `${key} = COALESCE(${index++}, ${key})`).join(", ")}
+                                WHERE item_fid = (SELECT id FROM items WHERE item_id = ${index++})`;
+    const categoryBasedValues = [
+      ...categoryKeys.map((key) => stock[key]),
+      stock.item_id,
+    ];
+
+    await pool.query(categoryBasedQuery, categoryBasedValues);
+  }
 };
 
 export const deleteStock = async (stock): Promise<void> => {
