@@ -356,17 +356,20 @@ CREATE OR REPLACE FUNCTION fn_docking_station_specifications_notify_event() RETU
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
         END IF;
 
-        payload = json_build_object(
+        IF view_data IS NOT NULL THEN
+            payload = json_build_object(
                 'table', 'stocks',
                 'operation', TG_OP,
-                'data', view_data);
+                'data', view_data
+            );
 
-        PERFORM pg_notify('table_update', payload::TEXT);
+            PERFORM pg_notify('table_update', payload::TEXT);
+        END IF;
 
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;
@@ -374,7 +377,7 @@ CREATE OR REPLACE FUNCTION fn_docking_station_specifications_notify_event() RETU
             RETURN NEW;
         END IF;
     END
-    $$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE TRIGGER tg_docking_station_specifications_insert_or_update
@@ -400,17 +403,20 @@ CREATE OR REPLACE FUNCTION fn_graphics_card_specifications_notify_event() RETURN
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
         END IF;
 
-        payload = json_build_object(
+        IF view_data IS NOT NULL THEN
+            payload = json_build_object(
                 'table', 'stocks',
                 'operation', TG_OP,
-                'data', view_data);
+                'data', view_data
+            );
 
-        PERFORM pg_notify('table_update', payload::TEXT);
+            PERFORM pg_notify('table_update', payload::TEXT);
+        END IF;
 
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;
@@ -444,17 +450,20 @@ CREATE OR REPLACE FUNCTION fn_laptop_specifications_notify_event() RETURNS trigg
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
         END IF;
 
-        payload = json_build_object(
+        IF view_data IS NOT NULL THEN
+            payload = json_build_object(
                 'table', 'stocks',
                 'operation', TG_OP,
-                'data', view_data);
+                'data', view_data
+            );
 
-        PERFORM pg_notify('table_update', payload::TEXT);
+            PERFORM pg_notify('table_update', payload::TEXT);
+        END IF;
 
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;
@@ -488,17 +497,20 @@ CREATE OR REPLACE FUNCTION fn_tft_specifications_notify_event() RETURNS trigger 
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = OLD.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE item_id = NEW.item_id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
         END IF;
 
-        payload = json_build_object(
+        IF view_data IS NOT NULL THEN
+            payload = json_build_object(
                 'table', 'stocks',
                 'operation', TG_OP,
-                'data', view_data);
+                'data', view_data
+            );
 
-        PERFORM pg_notify('table_update', payload::TEXT);
+            PERFORM pg_notify('table_update', payload::TEXT);
+        END IF;
 
         IF TG_OP = 'DELETE' THEN
             RETURN OLD;
