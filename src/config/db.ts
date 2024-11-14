@@ -11,9 +11,9 @@ export const pool = new pg.Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: Number(process.env.DB_PORT),
-  //ssl: {
-  //  rejectUnauthorized: false,
-  //},
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 pool.connect(async (error, client) => {
@@ -32,18 +32,3 @@ const notificationHandler = (message) => {
 
   io.emit("database", payload);
 };
-
-//export const executeQuery = async (query, values) => {
-//  try {
-//    pool.query("BEGIN");
-//
-//    const result = await pool.query(query, values);
-//
-//    pool.query("COMMIT");
-//
-//    return result.rows;
-//  } catch (error) {
-//    pool.query("ROLLBACK");
-//    throw error;
-//  }
-//};

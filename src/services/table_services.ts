@@ -89,17 +89,20 @@ export const createNewTable = async (table): Promise<void> => {
                                  payload JSON;
                              BEGIN
                                  IF TG_OP = 'DELETE' THEN
-                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = OLD.id;
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id::TEXT;
                                  ELSE
-                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE id = NEW.id;
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id::TEXT;
                                  END IF;
 
-                                 payload = json_build_object(
-                                         'table', TG_TABLE_NAME,
+                                 IF view_data IS NOT NULL THEN
+                                     payload = json_build_object(
+                                         'table', 'stocks',
                                          'operation', TG_OP,
-                                         'data', view_data);
+                                         'data', view_data
+                                     );
 
-                                 PERFORM pg_notify('table_update', payload::TEXT);
+                                     PERFORM pg_notify('table_update', payload::TEXT);
+                                 END IF;
 
                                  IF TG_OP = 'DELETE' THEN
                                      RETURN OLD;
