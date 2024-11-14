@@ -356,9 +356,9 @@ CREATE OR REPLACE FUNCTION fn_docking_station_specifications_notify_event() RETU
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id::TEXT;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id::TEXT;
         END IF;
 
         IF view_data IS NOT NULL THEN
@@ -403,9 +403,9 @@ CREATE OR REPLACE FUNCTION fn_graphics_card_specifications_notify_event() RETURN
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id::TEXT;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id::TEXT;
         END IF;
 
         IF view_data IS NOT NULL THEN
@@ -450,9 +450,9 @@ CREATE OR REPLACE FUNCTION fn_laptop_specifications_notify_event() RETURNS trigg
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id::TEXT;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id::TEXT;
         END IF;
 
         IF view_data IS NOT NULL THEN
@@ -497,9 +497,9 @@ CREATE OR REPLACE FUNCTION fn_tft_specifications_notify_event() RETURNS trigger 
         payload JSON;
     BEGIN
         IF TG_OP = 'DELETE' THEN
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id::TEXT;
         ELSE
-            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
+            SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id::TEXT;
         END IF;
 
         IF view_data IS NOT NULL THEN

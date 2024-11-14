@@ -89,9 +89,9 @@ export const createNewTable = async (table): Promise<void> => {
                                  payload JSON;
                              BEGIN
                                  IF TG_OP = 'DELETE' THEN
-                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id;
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = OLD.id::TEXT;
                                  ELSE
-                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id;
+                                     SELECT row_to_json(stocks_view) INTO view_data FROM stocks_view WHERE specifications ->> 'id' = NEW.id::TEXT;
                                  END IF;
 
                                  IF view_data IS NOT NULL THEN
