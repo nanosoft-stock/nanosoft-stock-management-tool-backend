@@ -14,10 +14,10 @@ export const getUserPreference = async (
     }
 
     await pool.query("BEGIN");
-    await preferenceService.addUserPreference(userId);
+    const result: any[] = await preferenceService.getUserPreference(userId);
     await pool.query("COMMIT");
 
-    res.status(200).send();
+    res.status(200).send({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     res.status(500).json({ error });
@@ -50,7 +50,7 @@ export const updateUserPreference = async (
     const { data: preference } = req.body;
 
     await pool.query("BEGIN");
-    await preferenceService.addUserPreference(preference);
+    await preferenceService.updateUserPreference(preference);
     await pool.query("COMMIT");
 
     res.status(204).send();
@@ -68,7 +68,7 @@ export const deleteUserPreference = async (
     const { data: preference } = req.body;
 
     await pool.query("BEGIN");
-    await preferenceService.addUserPreference(preference);
+    await preferenceService.deleteUserPreference(preference);
     await pool.query("COMMIT");
 
     res.status(204).send();

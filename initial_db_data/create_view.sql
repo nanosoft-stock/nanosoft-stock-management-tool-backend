@@ -8,6 +8,16 @@ AS
 
 -------------------------------------------------------------------------------
 
+CREATE OR REPLACE VIEW user_preferences_view
+AS
+    SELECT 
+        id,
+        current_user_table_preference_fid AS current_user_table_preference_id,
+        user_fid AS user_id
+    FROM user_preferences;
+
+-------------------------------------------------------------------------------
+
 CREATE OR REPLACE VIEW user_table_preferences_view
 AS
     SELECT 

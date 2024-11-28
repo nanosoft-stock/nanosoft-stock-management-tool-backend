@@ -3,11 +3,13 @@ import { pool } from "../config/db.js";
 
 export const getUserPreference = async (
   userId: string | number,
-): Promise<void> => {
-  const query = `SELECT * from user_preferences WHERE user_fid = $1`;
+): Promise<any[]> => {
+  const query = `SELECT * from user_preferences_view WHERE user_id = $1`;
   const values = [userId];
 
-  await pool.query(query, values);
+  const result: QueryResult = await pool.query(query, values);
+
+  return result.rows;
 };
 
 export const addUserPreference = async (preference): Promise<void> => {

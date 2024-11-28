@@ -42,6 +42,94 @@ CREATE OR REPLACE TRIGGER tg_users_delete
 -------------------------------------------------------------------------------
 
 
+CREATE OR REPLACE FUNCTION fn_user_preferences_notify_event() RETURNS trigger AS $$
+    DECLARE
+        view_data JSON;
+        payload JSON;
+    BEGIN
+        IF TG_OP = 'DELETE' THEN
+            SELECT row_to_json(user_preferences_view) INTO view_data FROM user_preferences_view WHERE id = OLD.id;
+        ELSE
+            SELECT row_to_json(user_preferences_view) INTO view_data FROM user_preferences_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
+                'table', TG_TABLE_NAME,
+                'operation', TG_OP,
+                'data', view_data);
+
+        PERFORM pg_notify('table_update', payload::TEXT);
+
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
+    END
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tg_user_preferences_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON user_preferences
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_user_preferences_notify_event();
+
+
+CREATE OR REPLACE TRIGGER tg_user_preferences_delete
+    BEFORE DELETE
+    ON user_preferences
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_user_preferences_notify_event();
+
+
+-------------------------------------------------------------------------------
+
+
+CREATE OR REPLACE FUNCTION fn_user_table_preferences_notify_event() RETURNS trigger AS $$
+    DECLARE
+        view_data JSON;
+        payload JSON;
+    BEGIN
+        IF TG_OP = 'DELETE' THEN
+            SELECT row_to_json(user_table_preferences_view) INTO view_data FROM user_table_preferences_view WHERE id = OLD.id;
+        ELSE
+            SELECT row_to_json(user_table_preferences_view) INTO view_data FROM user_table_preferences_view WHERE id = NEW.id;
+        END IF;
+
+        payload = json_build_object(
+                'table', TG_TABLE_NAME,
+                'operation', TG_OP,
+                'data', view_data);
+
+        PERFORM pg_notify('table_update', payload::TEXT);
+
+        IF TG_OP = 'DELETE' THEN
+            RETURN OLD;
+        ELSE 
+            RETURN NEW;
+        END IF;
+    END
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tg_user_table_preferences_insert_or_update
+    AFTER INSERT OR UPDATE
+    ON user_table_preferences
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_user_table_preferences_notify_event();
+
+
+CREATE OR REPLACE TRIGGER tg_user_table_preferences_delete
+    BEFORE DELETE
+    ON user_table_preferences
+    FOR EACH ROW
+        EXECUTE PROCEDURE fn_user_table_preferences_notify_event();
+
+
+-------------------------------------------------------------------------------
+
+
 CREATE OR REPLACE FUNCTION fn_categories_notify_event() RETURNS trigger AS $$
     DECLARE
         view_data JSON;
