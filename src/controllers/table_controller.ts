@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as tableService from "../services/table_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const createNewTable = async (
   req: Request,
@@ -16,6 +17,7 @@ export const createNewTable = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -37,6 +39,7 @@ export const addNewTableFields = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -58,6 +61,7 @@ export const updateTableFields = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -79,6 +83,7 @@ export const deleteTableFields = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };

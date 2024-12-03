@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import { generateToken } from "../config/authorization.js";
 import * as userService from "../services/user_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const getUserByEmail = async (
   req: Request,
@@ -19,6 +20,7 @@ export const getUserByEmail = async (
     res.status(200).json({ data: result, token });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -37,6 +39,7 @@ export const addNewUser = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -55,6 +58,7 @@ export const updateUser = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -73,6 +77,7 @@ export const deleteUser = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };

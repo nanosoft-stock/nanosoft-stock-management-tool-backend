@@ -51,6 +51,12 @@ export const createNewTable = async (table): Promise<void> => {
   );
   const categories = categoryResult.rows;
 
+  // Drop stocks_view
+  const dropStocksViewQuery = `DROP VIEW IF EXISTS stocks_view`;
+  const dropStocksViewValues = [];
+
+  await pool.query(dropStocksViewQuery, dropStocksViewValues);
+
   // Update stocks_view with the new category table
   const stocksViewQuery = `CREATE OR REPLACE VIEW stocks_view 
                            AS 
@@ -69,7 +75,8 @@ export const createNewTable = async (table): Promise<void> => {
                                    END AS specifications, 
                                    supplier_info, 
                                    comments, 
-                                   users.username AS username 
+                                   is_dispatched, 
+                                   users.username AS username
                                FROM stocks 
                                    LEFT JOIN items ON items.id = stocks.item_fid 
                                    LEFT JOIN categories ON categories.id = stocks.category_fid 

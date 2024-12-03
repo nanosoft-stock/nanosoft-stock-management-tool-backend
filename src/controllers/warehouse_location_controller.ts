@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as warehouseLocationService from "../services/warehouse_location_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const getAllWarehouseLocations = async (
   req: Request,
@@ -15,6 +16,7 @@ export const getAllWarehouseLocations = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -34,6 +36,7 @@ export const getWarehouseLocation = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -52,6 +55,7 @@ export const addWarehouseLocation = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -74,6 +78,7 @@ export const addWarehouseLocations = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -92,6 +97,7 @@ export const updateWarehouseLocation = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -114,6 +120,7 @@ export const updateWarehouseLocations = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -132,6 +139,7 @@ export const deleteWarehouseLocation = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -150,6 +158,7 @@ export const deleteWarehouseLocations = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };

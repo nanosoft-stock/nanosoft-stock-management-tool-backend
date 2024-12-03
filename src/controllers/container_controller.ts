@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as containerService from "../services/container_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const getAllContainers = async (
   req: Request,
@@ -14,6 +15,7 @@ export const getAllContainers = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -32,6 +34,7 @@ export const getContainer = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -50,6 +53,7 @@ export const addContainer = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -70,6 +74,7 @@ export const addContainers = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -88,6 +93,7 @@ export const updateContainer = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -108,6 +114,7 @@ export const updateContainers = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -126,6 +133,7 @@ export const deleteContainer = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -144,6 +152,7 @@ export const deleteContainers = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -165,6 +174,7 @@ export const generateNewContainers = async (
     res.status(201).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -183,6 +193,7 @@ export const deleteGeneratedContainers = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };

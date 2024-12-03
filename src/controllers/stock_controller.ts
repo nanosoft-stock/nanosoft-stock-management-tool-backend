@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as stockService from "../services/stock_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const getAllStocks = async (
   req: Request,
@@ -14,6 +15,7 @@ export const getAllStocks = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -29,6 +31,7 @@ export const getStock = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -44,6 +47,7 @@ export const addStock = async (req: Request, res: Response): Promise<void> => {
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -61,6 +65,7 @@ export const addStocks = async (req: Request, res: Response): Promise<void> => {
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -79,6 +84,7 @@ export const updateStock = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -99,6 +105,7 @@ export const updateStocks = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -117,6 +124,7 @@ export const deleteStock = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -137,6 +145,7 @@ export const deleteStocks = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -155,6 +164,7 @@ export const queryStocks = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as fieldsService from "../services/fields_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const getAllFields = async (
   req: Request,
@@ -14,6 +15,7 @@ export const getAllFields = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -32,6 +34,7 @@ export const getCategoryFields = async (
     res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -47,6 +50,7 @@ export const addField = async (req: Request, res: Response): Promise<void> => {
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -64,6 +68,7 @@ export const addFields = async (req: Request, res: Response): Promise<void> => {
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -82,6 +87,7 @@ export const updateField = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -102,6 +108,7 @@ export const updateFields = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -120,6 +127,7 @@ export const deleteField = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -138,6 +146,7 @@ export const deleteFields = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };

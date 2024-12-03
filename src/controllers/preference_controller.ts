@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { pool } from "../config/db.js";
 import * as preferenceService from "../services/preference_services.js";
+import { printDebugError } from "../helpers/print_error.js";
 
 export const getUserPreference = async (
   req: Request,
@@ -20,6 +21,7 @@ export const getUserPreference = async (
     res.status(200).send({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -38,6 +40,7 @@ export const addUserPreference = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -56,6 +59,7 @@ export const updateUserPreference = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -74,6 +78,7 @@ export const deleteUserPreference = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -104,6 +109,7 @@ export const getUserTablePreference = async (
     res.status(200).send({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -127,6 +133,7 @@ export const getAllUserTablePreferences = async (
     res.status(200).send({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -150,6 +157,7 @@ export const getUserCurrentTablePreference = async (
     res.status(200).send({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -168,6 +176,7 @@ export const addUserTablePreference = async (
     res.status(201).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -186,6 +195,7 @@ export const updateUserTablePreference = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
@@ -204,6 +214,7 @@ export const deleteUserTablePreference = async (
     res.status(204).send();
   } catch (error) {
     await pool.query("ROLLBACK");
+    printDebugError(error);
     res.status(500).json({ error });
   }
 };
