@@ -25,15 +25,6 @@ export const getAllStocks = async (): Promise<any[]> => {
   return result.rows;
 };
 
-export const getStock = async (itemId: string): Promise<any[]> => {
-  const query = `SELECT * FROM stocks_view WHERE item_id = $1`;
-  const values = [itemId];
-
-  const result: QueryResult = await pool.query(query, values);
-
-  return result.rows;
-};
-
 export const addStock = async (stock): Promise<void> => {
   const stockQuery = `INSERT INTO stocks 
                       (item_fid, category_fid, sku_fid, serial_number, container_fid, warehouse_location_fid, supplier_info, comments, user_fid) 
@@ -158,7 +149,6 @@ export const queryStocks = async (q): Promise<any[]> => {
   q["from"] = "stocks_view";
 
   const { query, values } = queryBuilderHelper(q);
-
   const result: QueryResult = await pool.query(query, values);
 
   return postProcessStocks(result.rows);

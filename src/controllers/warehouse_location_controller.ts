@@ -21,26 +21,6 @@ export const getAllWarehouseLocations = async (
   }
 };
 
-export const getWarehouseLocation = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const warehouseLocationId = req.params.warehouseLocationId;
-
-    await pool.query("BEGIN");
-    const result: any[] =
-      await warehouseLocationService.getWarehouseLocation(warehouseLocationId);
-    await pool.query("COMMIT");
-
-    res.status(200).json({ data: result });
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    printDebugError(error);
-    res.status(500).json({ error });
-  }
-};
-
 export const addWarehouseLocation = async (
   req: Request,
   res: Response,
@@ -156,6 +136,26 @@ export const deleteWarehouseLocations = async (
     await pool.query("COMMIT");
 
     res.status(204).send();
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    printDebugError(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const queryWarehouseLocations = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { data: q } = req.body;
+
+    await pool.query("BEGIN");
+    const result: any[] =
+      await warehouseLocationService.queryWarehouseLocations(q);
+    await pool.query("COMMIT");
+
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     printDebugError(error);

@@ -9,7 +9,11 @@ export const getUserByEmail = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const email: string = req.params.email;
+    const email = req.query.email;
+
+    if (typeof email != "string") {
+      throw new TypeError("Invalid email");
+    }
 
     const token = generateToken(email);
 

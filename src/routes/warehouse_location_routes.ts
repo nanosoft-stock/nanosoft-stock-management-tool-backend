@@ -6,9 +6,6 @@ const warehouseLocationRouter: Router = Router();
 warehouseLocationRouter
   .route("/")
   .get(WarehouseLocationController.getAllWarehouseLocations);
-warehouseLocationRouter
-  .route("/:warehouseLocationId")
-  .get(WarehouseLocationController.getWarehouseLocation);
 
 warehouseLocationRouter
   .route("/")
@@ -30,5 +27,9 @@ warehouseLocationRouter
 warehouseLocationRouter
   .route("/batch")
   .delete(WarehouseLocationController.deleteWarehouseLocations);
+
+warehouseLocationRouter
+  .route("/query")
+  .post(WarehouseLocationController.queryWarehouseLocations);
 
 export default warehouseLocationRouter;

@@ -20,25 +20,6 @@ export const getAllContainers = async (
   }
 };
 
-export const getContainer = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const containerId: string = req.params.containerId;
-
-    await pool.query("BEGIN");
-    const result: any[] = await containerService.getContainer(containerId);
-    await pool.query("COMMIT");
-
-    res.status(200).json({ data: result });
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    printDebugError(error);
-    res.status(500).json({ error });
-  }
-};
-
 export const addContainer = async (
   req: Request,
   res: Response,
@@ -150,6 +131,25 @@ export const deleteContainers = async (
     await pool.query("COMMIT");
 
     res.status(204).send();
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    printDebugError(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const queryContainers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { data: q } = req.body;
+
+    await pool.query("BEGIN");
+    const result: any[] = await containerService.queryContainers(q);
+    await pool.query("COMMIT");
+
+    res.status(200).json({ data: result });
   } catch (error) {
     await pool.query("ROLLBACK");
     printDebugError(error);

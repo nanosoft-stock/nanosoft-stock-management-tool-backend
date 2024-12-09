@@ -6,9 +6,6 @@ const stockLocationHistoryRouter: Router = Router();
 stockLocationHistoryRouter
   .route("/")
   .get(SlhController.getAllStockLocationHistory);
-stockLocationHistoryRouter
-  .route("/:id")
-  .get(SlhController.getStockLocationHistory);
 
 stockLocationHistoryRouter
   .route("/")
@@ -34,5 +31,11 @@ stockLocationHistoryRouter
 stockLocationHistoryRouter
   .route("/query")
   .post(SlhController.queryStockLocationHistory);
+
+stockLocationHistoryRouter.route("/itemHistory").get(SlhController.itemHistory);
+
+stockLocationHistoryRouter
+  .route("/containerHistory")
+  .get(SlhController.containerHistory);
 
 export default stockLocationHistoryRouter;

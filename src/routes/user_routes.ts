@@ -4,7 +4,7 @@ import { authorizeUser } from "../config/authorization.js";
 
 const userRouter: Router = Router();
 
-userRouter.route("/:email").get(UserController.getUserByEmail);
+userRouter.route("/").get(UserController.getUserByEmail);
 
 userRouter.route("/").post(UserController.addNewUser);
 

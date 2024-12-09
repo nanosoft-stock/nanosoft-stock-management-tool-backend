@@ -4,7 +4,6 @@ import * as CategoryController from "../controllers/category_controller.js";
 const categoryRouter: Router = Router();
 
 categoryRouter.route("/").get(CategoryController.getAllCategories);
-categoryRouter.route("/:category").get(CategoryController.getCategory);
 
 categoryRouter.route("/").post(CategoryController.addNewCategory);
 

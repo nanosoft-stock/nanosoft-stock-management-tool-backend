@@ -10,15 +10,6 @@ export const getAllFields = async (): Promise<any[]> => {
   return result.rows;
 };
 
-export const getCategoryFields = async (category: string): Promise<any[]> => {
-  const query = `SELECT * FROM fields_view WHERE category = $1 ORDER BY display_order`;
-  const values = [category];
-
-  const result: QueryResult = await pool.query(query, values);
-
-  return result.rows;
-};
-
 export const addField = async (field): Promise<void> => {
   const query = `INSERT INTO fields 
                  (field, category_fid, datatype, in_sku, is_background, is_lockable, name_case, value_case, display_order, created_by) 

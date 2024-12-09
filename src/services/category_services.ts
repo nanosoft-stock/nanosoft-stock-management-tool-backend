@@ -10,15 +10,6 @@ export const getAllCategories = async (): Promise<any[]> => {
   return result.rows;
 };
 
-export const getCategory = async (category: string): Promise<any[]> => {
-  const query = `SELECT * FROM categories_view WHERE category = $1`;
-  const values = [category];
-
-  const result: QueryResult = await pool.query(query, values);
-
-  return result.rows;
-};
-
 export const addNewCategory = async (category): Promise<void> => {
   const query = `INSERT INTO categories (category, created_by) 
                  VALUES ($1, $2)`;

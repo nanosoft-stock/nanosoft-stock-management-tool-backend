@@ -1,20 +1,10 @@
 import { QueryResult } from "pg";
 import { pool } from "../config/db.js";
+import { queryBuilderHelper } from "../helpers/query_builder_helper.js";
 
 export const getAllWarehouseLocations = async (): Promise<any[]> => {
   const query = `SELECT * FROM warehouse_locations_view ORDER BY warehouse_location_id`;
   const values = [];
-
-  const result: QueryResult = await pool.query(query, values);
-
-  return result.rows;
-};
-
-export const getWarehouseLocation = async (
-  warehouseLocationId,
-): Promise<any[]> => {
-  const query = `SELECT * FROM warehouse_locations_view WHERE warehouse_location_id = $1`;
-  const values = [warehouseLocationId];
 
   const result: QueryResult = await pool.query(query, values);
 
@@ -69,4 +59,13 @@ export const deleteWarehouseLocations = async (
   ];
 
   await pool.query(query, values);
+};
+
+export const queryWarehouseLocations = async (q): Promise<any[]> => {
+  q["from"] = "warehouse_locations_view";
+
+  const { query, values } = queryBuilderHelper(q);
+  const result: QueryResult = await pool.query(query, values);
+
+  return result.rows;
 };

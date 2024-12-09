@@ -20,25 +20,6 @@ export const getAllStockLocationHistory = async (
   }
 };
 
-export const getStockLocationHistory = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const id = req.params.id;
-
-    await pool.query("BEGIN");
-    const result: any[] = await slhService.getStockLocationHistory(id);
-    await pool.query("COMMIT");
-
-    res.status(200).json({ data: result });
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    printDebugError(error);
-    res.status(500).json({ error });
-  }
-};
-
 export const addStockLocationHistory = async (
   req: Request,
   res: Response,
@@ -166,6 +147,52 @@ export const queryStockLocationHistory = async (
 
     await pool.query("BEGIN");
     const result: any[] = await slhService.queryStockLocationHistory(q);
+    await pool.query("COMMIT");
+
+    res.status(200).json({ data: result });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    printDebugError(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const itemHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const itemId = req.query.item_id;
+
+    if (typeof itemId != "string" && typeof itemId != "number") {
+      throw new TypeError("Invalid item_id");
+    }
+
+    await pool.query("BEGIN");
+    const result: any[] = await slhService.itemHistory(itemId);
+    await pool.query("COMMIT");
+
+    res.status(200).json({ data: result });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    printDebugError(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const containerHistory = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const containerId = req.query.container_id;
+
+    if (typeof containerId != "string" && typeof containerId != "number") {
+      throw new TypeError("Invalid container_id");
+    }
+
+    await pool.query("BEGIN");
+    const result: any[] = await slhService.containerHistory(containerId);
     await pool.query("COMMIT");
 
     res.status(200).json({ data: result });

@@ -4,7 +4,6 @@ import * as StockController from "../controllers/stock_controller.js";
 const stockRouter: Router = Router();
 
 stockRouter.route("/").get(StockController.getAllStocks);
-stockRouter.route("/:itemId").get(StockController.getStock);
 
 stockRouter.route("/").post(StockController.addStock);
 stockRouter.route("/batch").post(StockController.addStocks);

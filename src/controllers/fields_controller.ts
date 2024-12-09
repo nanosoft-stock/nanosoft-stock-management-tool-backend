@@ -20,25 +20,6 @@ export const getAllFields = async (
   }
 };
 
-export const getCategoryFields = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const category = req.params.category;
-
-    await pool.query("BEGIN");
-    const result: any[] = await fieldsService.getCategoryFields(category);
-    await pool.query("COMMIT");
-
-    res.status(200).json({ data: result });
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    printDebugError(error);
-    res.status(500).json({ error });
-  }
-};
-
 export const addField = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: field } = req.body;

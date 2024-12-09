@@ -20,25 +20,6 @@ export const getAllCategories = async (
   }
 };
 
-export const getCategory = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const category: string = req.params.category;
-
-    await pool.query("BEGIN");
-    const result: any[] = await categoryService.getCategory(category);
-    await pool.query("COMMIT");
-
-    res.status(200).json({ data: result });
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    printDebugError(error);
-    res.status(500).json({ error });
-  }
-};
-
 export const addNewCategory = async (
   req: Request,
   res: Response,

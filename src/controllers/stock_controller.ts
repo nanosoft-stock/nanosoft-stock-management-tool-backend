@@ -20,22 +20,6 @@ export const getAllStocks = async (
   }
 };
 
-export const getStock = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const itemId = req.params.itemId;
-
-    await pool.query("BEGIN");
-    const result: any[] = await stockService.getStock(itemId);
-    await pool.query("COMMIT");
-
-    res.status(200).json({ data: result });
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    printDebugError(error);
-    res.status(500).json({ error });
-  }
-};
-
 export const addStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const { data: stock } = req.body;

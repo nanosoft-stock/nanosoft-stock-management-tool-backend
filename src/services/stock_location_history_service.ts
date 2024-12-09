@@ -11,15 +11,6 @@ export const getAllStockLocationHistory = async (): Promise<any[]> => {
   return result.rows;
 };
 
-export const getStockLocationHistory = async (id: string): Promise<any[]> => {
-  const query = `SELECT * FROM stock_location_history_view WHERE id = $1`;
-  const values = [id];
-
-  const result: QueryResult = await pool.query(query, values);
-
-  return result.rows;
-};
-
 export const addStockLocationHistory = async (history): Promise<void> => {
   const query = `INSERT INTO stock_location_history 
                  (group_uuid, items, container_fid, warehouse_location_fid, move_type, status, user_fid) 
@@ -82,6 +73,28 @@ export const queryStockLocationHistory = async (q): Promise<any[]> => {
   q["from"] = "stock_location_history_view";
 
   const { query, values } = queryBuilderHelper(q);
+  const result: QueryResult = await pool.query(query, values);
+
+  return result.rows;
+};
+
+export const itemHistory = async (itemId: string): Promise<any[]> => {
+  const query = `SELECT * FROM stock_location_history_view WHERE $1 = ANY(items) AND status = 'completed' ORDER BY date DESC;`;
+  const values = [itemId];
+
+  const result: QueryResult = await pool.query(query, values);
+
+  return result.rows;
+};
+
+export const containerHistory = async (containerId: string): Promise<any[]> => {
+  const query = `SELECT * FROM stock_location_history_view WHERE id = ANY(
+                     SELECT id FROM stock_location_history_view WHERE container_id = $1 AND move_type = 'container move' AND status = 'completed' GROUP BY date, id, group_uuid, container_id, warehouse_location_id)
+             UNION
+                 SELECT * FROM stock_location_history_view WHERE id = ANY(
+                     SELECT id FROM stock_location_history_view WHERE container_id = $2 AND (move_type = 'individual' or move_type = 'excel import') AND status = 'completed' GROUP BY date, id, group_uuid, container_id, warehouse_location_id ORDER BY date LIMIT 1)
+             ORDER BY date DESC`;
+  const values = [containerId, containerId];
 
   const result: QueryResult = await pool.query(query, values);
 
