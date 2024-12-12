@@ -9,6 +9,19 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE (email)
 );
 
+CREATE TABLE IF NOT EXISTS user_table_preferences (
+    id SERIAL,
+    user_fid INT NOT NULL,
+    table_preference_name VARCHAR(50) NOT NULL,
+    columns JSONB[] NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_on TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    modified_on TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_fid) REFERENCES users(id)
+);
+
 CREATE TABLE IF NOT EXISTS user_preferences (
     id SERIAL,
     user_fid INT NOT NULL,
@@ -21,19 +34,6 @@ CREATE TABLE IF NOT EXISTS user_preferences (
     FOREIGN KEY (user_fid) REFERENCES users(id),
     FOREIGN KEY (current_user_table_preference_fid) REFERENCES user_table_preferences(id),
     UNIQUE(user_fid)
-);
-
-CREATE TABLE IF NOT EXISTS user_table_preferences (
-    id SERIAL,
-    user_fid INT NOT NULL,
-    table_preference_name VARCHAR(50) NOT NULL,
-    columns JSONB[] NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    created_on TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-    modified_on TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
-
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_fid) REFERENCES users(id)
 );
 
 -- Should I only store the last modified information (date, by_whom) OR
@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS stocks (
     supplier_info VARCHAR(255),
     comments VARCHAR(255),
     user_fid INT NOT NULL, -- created_by
+    is_dispatched BOOLEAN NOT NULL DEFAULT false,
     is_active BOOLEAN NOT NULL DEFAULT true,
 
     PRIMARY KEY (id),

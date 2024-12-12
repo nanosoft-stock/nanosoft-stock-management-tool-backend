@@ -111,13 +111,14 @@ AS
         serial_number,
         containers.container_id AS container_id,
         warehouse_locations.warehouse_location_id AS warehouse_location_id,
-        CASE
-            WHEN (stocks.category_fid = 1) THEN row_to_json(docking_station_specifications)
-            WHEN (stocks.category_fid = 2) THEN row_to_json(graphics_card_specifications)
-            WHEN (stocks.category_fid = 3) THEN row_to_json(laptop_specifications)
-            WHEN (stocks.category_fid = 4) THEN row_to_json(tft_specifications)
-            ELSE NULL
-        END AS specifications,
+        NULL AS specifications,
+--        CASE
+--            WHEN (stocks.category_fid = 1) THEN row_to_json(docking_station_specifications)
+--            WHEN (stocks.category_fid = 2) THEN row_to_json(graphics_card_specifications)
+--            WHEN (stocks.category_fid = 3) THEN row_to_json(laptop_specifications)
+--            WHEN (stocks.category_fid = 4) THEN row_to_json(tft_specifications)
+--            ELSE NULL
+--        END AS specifications,
         supplier_info,
         comments,
         users.username AS username,
@@ -128,10 +129,10 @@ AS
         LEFT JOIN skus ON skus.id = stocks.sku_fid
         LEFT JOIN containers ON containers.id = stocks.container_fid
         LEFT JOIN warehouse_locations ON warehouse_locations.id = stocks.warehouse_location_fid
-        LEFT JOIN docking_station_specifications ON docking_station_specifications.item_fid = stocks.item_fid
-        LEFT JOIN graphics_card_specifications ON graphics_card_specifications.item_fid = stocks.item_fid
-        LEFT JOIN laptop_specifications ON laptop_specifications.item_fid = stocks.item_fid
-        LEFT JOIN tft_specifications ON tft_specifications.item_fid = stocks.item_fid
+--         LEFT JOIN docking_station_specifications ON docking_station_specifications.item_fid = stocks.item_fid
+--         LEFT JOIN graphics_card_specifications ON graphics_card_specifications.item_fid = stocks.item_fid
+--         LEFT JOIN laptop_specifications ON laptop_specifications.item_fid = stocks.item_fid
+--         LEFT JOIN tft_specifications ON tft_specifications.item_fid = stocks.item_fid
         LEFT JOIN users ON users.id = stocks.user_fid;
 
 -------------------------------------------------------------------------------
