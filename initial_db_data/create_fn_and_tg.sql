@@ -547,7 +547,7 @@ AS $$
 CREATE SEQUENCE IF NOT EXISTS sq_generate_container_ids
     AS INT
     INCREMENT BY 1
-    MINVALUE 0
+    MINVALUE 1
     MAXVALUE 9999999;
 
 
