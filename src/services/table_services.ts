@@ -31,7 +31,8 @@ export const createNewTable = async (table): Promise<void> => {
   const newTableQuery = `CREATE TABLE IF NOT EXISTS ${toLowerSnakeCase(table.category)}_specifications (
                          id SERIAL, 
                          item_fid INT NOT NULL, 
-                         ${categoryFields.map((e) => `${toLowerSnakeCase(e.field)} VARCHAR(255)`).join(", \n")}, 
+                         ${categoryFields.map((e) => `${toLowerSnakeCase(e.field)} VARCHAR(255)`).join(", \n")}
+                         ${categoryFields.length != 0 ? "," : ""}
 
                          PRIMARY KEY(id), 
                          UNIQUE(item_fid), 

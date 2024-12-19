@@ -709,8 +709,13 @@ CREATE OR REPLACE FUNCTION fn_item_location_updated() RETURNS TRIGGER AS $$
             LOOP
                 is_dispatch := false;
 
-                IF (SELECT container_id FROM containers WHERE id = NEW.container_fid) = 'ST0000000' AND (SELECT warehouse_location_id FROM warehouse_locations WHERE id = NEW.warehouse_location_fid) = 'DISPATCH' THEN
+                IF (SELECT container_id FROM containers WHERE id = NEW.container_fid) = 'ST0000000' AND (SELECT warehouse_location_id FROM warehouse_locations WHERE id = NEW.warehouse_location_fid) = 'SHIPPED' THEN
                     is_dispatch = true;
+
+                    UPDATE items
+                    SET status = 'dispatched'
+                    WHERE items.item_id = element;
+
                 END IF;
 
                 UPDATE 
